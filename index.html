@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineWave | 頂級電影探索與排行</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            900: '#78350f',
+                            appleRed: '#ef4444',
+                            appleGreen: '#84cc16',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+        .backdrop-blur-nav {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .text-glow {
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+        }
+        .text-glow-red {
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+        }
+        /* Custom horizontal gallery scroll */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col selection:bg-brand-500 selection:text-slate-950">
+
+    <header class="fixed top-0 left-0 w-full z-40 bg-slate-950/85 backdrop-blur-nav border-b border-slate-900/60 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2.5 cursor-pointer" onclick="switchTab('home')">
+                    <div class="bg-gradient-to-tr from-rose-600 to-amber-500 p-2.5 rounded-xl shadow-lg shadow-rose-600/20">
+                        <i class="fas fa-apple-whole text-slate-950 text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl sm:text-2xl font-black tracking-wider bg-gradient-to-r from-white via-slate-100 to-brand-500 bg-clip-text text-transparent">CINEWAVE</span>
+                        <span class="block text-[9px] text-slate-500 tracking-widest uppercase font-bold leading-none mt-0.5">GitHub Pages Edition</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-1.5">
+                    <button onclick="switchTab('home')" id="nav-home" class="nav-btn px-4.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 text-brand-500 bg-slate-900/50">
+                        <i class="fas fa-compass mr-1.5"></i> 首頁推薦
+                    </button>
+                    <button onclick="switchTab('rank')" id="nav-rank" class="nav-btn px-4.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-900">
+                        <i class="fas fa-trophy mr-1.5"></i> 熱門排行
+                    </button>
+                    <button onclick="switchTab('reviews')" id="nav-reviews" class="nav-btn px-4.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-900">
+                        <i class="fas fa-comments mr-1.5"></i> 電影評論
+                    </button>
+                </nav>
+
+                <!-- Status & Mobile Menu Toggle -->
+                <div class="flex items-center space-x-4">
+                    <div class="hidden lg:block text-[11px] bg-slate-900/60 border border-slate-800 px-3.5 py-1.5 rounded-full text-slate-400 font-medium">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse mr-2"></span>
+                        已整合爛蘋果專利數據
+                    </div>
+                    <button onclick="toggleMobileMenu()" class="md:hidden text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-900 focus:outline-none transition">
+                        <i id="menu-icon" class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-950 border-b border-slate-900/80 px-4 pt-2 pb-6 space-y-2">
+            <button onclick="switchTab('home'); toggleMobileMenu();" class="w-full text-left px-4 py-3.5 rounded-xl text-base font-semibold flex items-center text-brand-500 bg-slate-900/50">
+                <i class="fas fa-compass w-7 text-lg"></i> 首頁推薦
+            </button>
+            <button onclick="switchTab('rank'); toggleMobileMenu();" class="w-full text-left px-4 py-3.5 rounded-xl text-base font-semibold flex items-center text-slate-300 hover:bg-slate-900">
+                <i class="fas fa-trophy w-7 text-lg"></i> 熱門排行
+            </button>
+            <button onclick="switchTab('reviews'); toggleMobileMenu();" class="w-full text-left px-4 py-3.5 rounded-xl text-base font-semibold flex items-center text-slate-300 hover:bg-slate-900">
+                <i class="fas fa-comments w-7 text-lg"></i> 電影評論
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow pt-16 sm:pt-20">
+        <!-- TAB 1: HOME PAGE -->
+        <div id="tab-content-home" class="tab-content transition-opacity duration-300">
+            <!-- Hero Spotlight Section -->
+            <section class="relative min-h-[55vh] sm:min-h-[70vh] flex items-center justify-center overflow-hidden py-16 px-4">
+                <div class="absolute inset-0 bg-cover bg-center opacity-25 scale-105 transform transition duration-[10s]" id="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1920');"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-transparent to-slate-950"></div>
+                
+                <div class="relative max-w-5xl mx-auto text-center z-10 space-y-5">
+                    <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30 mb-2 animate-pulse">
+                        <i class="fas fa-fire mr-1.5 animate-bounce"></i> 當期焦點大片
+                    </span>
+                    <h1 id="hero-title" class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-tight text-glow">
+                        沙丘：第二部 <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-rose-500">Dune: Part Two</span>
+                    </h1>
+                    <p id="hero-desc" class="text-sm sm:text-base lg:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed font-light">
+                        保羅·亞崔迪與弗瑞曼人聯手，對背叛他家族的陰謀者展開報復。在親眼目睹未來可能發生的末日景象後，他必須在摯愛與全宇宙的命運之間做出殘酷決擇。
+                    </p>
+                    
+                    <!-- Rotten Apple Index on Hero -->
+                    <div id="hero-rotten-badge" class="flex items-center justify-center space-x-6 py-1">
+                        <div class="flex items-center space-x-2 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-800">
+                            <i class="fas fa-apple-whole text-brand-appleRed text-lg"></i>
+                            <span class="text-xs text-slate-400 font-semibold">專業鮮度:</span>
+                            <span class="text-sm font-black text-slate-100" id="hero-rotten-critics">92%</span>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-800">
+                            <i class="fas fa-popcorn text-yellow-500 text-lg"></i>
+                            <span class="text-xs text-slate-400 font-semibold">觀眾爆米花:</span>
+                            <span class="text-sm font-black text-slate-100" id="hero-rotten-audience">95%</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                        <button onclick="openHeroDetail()" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-brand-500 to-rose-500 text-slate-950 font-bold hover:shadow-xl hover:shadow-brand-500/25 transform hover:-translate-y-0.5 transition-all duration-200 text-sm">
+                            <i class="fas fa-info-circle mr-1.5"></i> 查看電影詳情
+                        </button>
+                        <button onclick="switchTab('rank')" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-slate-900 border border-slate-800 text-white font-semibold hover:bg-slate-800 transition-all duration-200 text-sm">
+                            <i class="fas fa-chart-line mr-1.5"></i> 探索三大排行榜
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Exploration Area -->
+            <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <!-- Search & Filters Bar -->
+                <div class="bg-slate-900/40 p-6 rounded-2xl border border-slate-900 mb-12 backdrop-blur-sm">
+                    <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
+                        <!-- Search Box -->
+                        <div class="relative w-full md:w-96">
+                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                            <input type="text" id="search-input" oninput="filterMovies()" placeholder="搜尋電影名稱、導演或演員..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-11 pr-4 py-3.5 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all duration-200 text-sm">
+                        </div>
+                        
+                        <!-- Theme Filters -->
+                        <div class="flex flex-wrap gap-2 w-full md:w-auto justify-start md:justify-end">
+                            <button onclick="setThemeFilter('all')" class="theme-tab-btn px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 bg-brand-500 text-slate-950" data-theme="all">
+                                全部主題
+                            </button>
+                            <button onclick="setThemeFilter('thriller')" class="theme-tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 bg-slate-950 border border-slate-850 text-slate-400 hover:text-white" data-theme="thriller">
+                                🔪 驚悚懸疑
+                            </button>
+                            <button onclick="setThemeFilter('scifi')" class="theme-tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 bg-slate-950 border border-slate-850 text-slate-400 hover:text-white" data-theme="scifi">
+                                🚀 科幻冒險
+                            </button>
+                            <button onclick="setThemeFilter('romance')" class="theme-tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 bg-slate-950 border border-slate-850 text-slate-400 hover:text-white" data-theme="romance">
+                                💖 愛情浪漫
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Theme Showcases Headers & Movie Grid -->
+                <div id="movie-grid-container" class="space-y-16">
+                    <!-- Dynamic grids will be injected by JavaScript here -->
+                </div>
+            </section>
+        </div>
+
+        <!-- TAB 2: RANKINGS PAGE (熱門排行) -->
+        <div id="tab-content-rank" class="tab-content hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 transition-opacity duration-300">
+            <div class="text-center max-w-3xl mx-auto mb-12 space-y-3">
+                <span class="text-brand-500 text-xs font-bold uppercase tracking-widest"><i class="fas fa-chart-line mr-1.5"></i> 即時推薦指標</span>
+                <h2 class="text-3xl sm:text-5xl font-black mt-2">口碑與爛蘋果綜合排行</h2>
+                <p class="text-slate-400 mt-3 text-sm sm:text-base leading-relaxed font-light">
+                    整合了 CineWave 投票以及權威爛蘋果指數（Rotten Apples Index），為您挑選出最佳與最爛的極致作。點選「給予推薦票」投下您神聖的一票。
+                </p>
+            </div>
+
+            <!-- Rankings Sorting and Stats Panel -->
+            <div class="bg-slate-900/40 p-6 rounded-2xl border border-slate-900 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-slate-400"><i class="fas fa-sort-amount-down mr-1"></i> 排序指標:</span>
+                    <select id="sort-select" onchange="renderRankings()" class="bg-slate-950 border border-slate-850 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-brand-500 cursor-pointer">
+                        <option value="score">CineWave 評分</option>
+                        <option value="rottenCritics">爛蘋果專業鮮度 (Critics)</option>
+                        <option value="votes">影迷總投票數</option>
+                    </select>
+                </div>
+                <div class="text-sm text-slate-400">
+                    目前排行統計樣本：共計 <span id="total-votes-count" class="text-brand-500 font-bold">18,500+</span> 票
+                </div>
+            </div>
+
+            <!-- Ranking List -->
+            <div id="ranking-list" class="space-y-4">
+                <!-- Ranking items will be dynamically rendered here -->
+            </div>
+        </div>
+
+        <!-- TAB 3: REVIEWS PAGE (電影評論) -->
+        <div id="tab-content-reviews" class="tab-content hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 transition-opacity duration-300">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left panel: Community review form -->
+                <div class="lg:col-span-1">
+                    <div class="bg-slate-900/70 border border-slate-900/80 p-6 rounded-2xl sticky top-24 space-y-6">
+                        <div class="flex items-center space-x-2 text-brand-500">
+                            <i class="fas fa-pen-fancy"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider">發表你的爛蘋果點評</span>
+                        </div>
+                        <h3 class="text-2xl font-bold">撰寫影評</h3>
+                        <form id="review-form" onsubmit="handleReviewSubmit(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">選擇電影 *</label>
+                                <select id="review-movie-select" required class="w-full bg-slate-950 border border-slate-850 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                                    <!-- Options populated dynamically -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">你的爛蘋果評價 *</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-850">
+                                        <span class="block text-[10px] text-slate-500 mb-1">給專業鮮度 (0-100)</span>
+                                        <input type="number" id="review-critics-score" min="0" max="100" value="90" required class="w-full bg-transparent text-slate-200 text-sm font-bold focus:outline-none">
+                                    </div>
+                                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-850">
+                                        <span class="block text-[10px] text-slate-500 mb-1">給爆米花 (0-100)</span>
+                                        <input type="number" id="review-audience-score" min="0" max="100" value="88" required class="w-full bg-transparent text-slate-200 text-sm font-bold focus:outline-none">
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">筆名 / 暱稱 *</label>
+                                <input type="text" id="review-author" required placeholder="如：不願透露姓名的影迷" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder-slate-650 focus:outline-none focus:border-brand-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">影評標題 *</label>
+                                <input type="text" id="review-title" required placeholder="一言以蔽之這部電影對你的衝擊" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder-slate-650 focus:outline-none focus:border-brand-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">影評內容 *</label>
+                                <textarea id="review-content" required rows="5" placeholder="分享這部電影打動你的地方，或者深度吐槽..." class="w-full bg-slate-950 border border-slate-850 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder-slate-650 focus:outline-none focus:border-brand-500 resize-none"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-gradient-to-r from-brand-500 to-rose-500 text-slate-950 font-bold py-3.5 rounded-xl hover:shadow-lg hover:shadow-brand-500/15 transition duration-200 flex items-center justify-center space-x-2 text-sm">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>發布我的評價</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Right panel: Movie analysis feed -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-2xl font-bold flex items-center space-x-2">
+                            <i class="fas fa-stream text-brand-500"></i>
+                            <span>熱門影評流</span>
+                        </h3>
+                        <span class="text-xs text-slate-400 bg-slate-900 border border-slate-800 px-3 py-1 rounded-full font-medium" id="total-reviews-badge">共 3 篇精選點評</span>
+                    </div>
+
+                    <div id="reviews-feed" class="space-y-6">
+                        <!-- Custom reviews dynamically loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MOVIE DETAIL MODAL -->
+    <div id="movie-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-slate-950/95 backdrop-blur-md transition-opacity duration-300" onclick="closeModal()"></div>
+        
+        <!-- Modal Content Container -->
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="relative bg-slate-900 border border-slate-800 w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl transform transition-all duration-300 scale-95 opacity-0" id="modal-box">
+                <!-- Close Button -->
+                <button onclick="closeModal()" class="absolute top-4 right-4 z-20 bg-slate-950/80 border border-slate-850 hover:text-brand-500 p-2 rounded-full text-slate-400 transition">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+
+                <!-- Header / Backdrop Visual -->
+                <div class="relative h-56 sm:h-80 w-full bg-cover bg-center" id="modal-banner">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="p-6 sm:p-8 -mt-24 relative z-10">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <!-- Poster block -->
+                        <div class="w-full md:w-1/3 flex-shrink-0 self-center md:self-start">
+                            <img id="modal-poster" src="" alt="Movie Poster" class="w-44 sm:w-full max-w-[190px] md:max-w-none mx-auto rounded-xl shadow-2xl border-2 border-slate-800" onerror="this.src='https://placehold.co/300x450/1e293b/ffffff?text=CineWave'">
+                        </div>
+
+                        <!-- Text Details -->
+                        <div class="w-full md:w-2/3 space-y-4">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span id="modal-theme" class="px-3 py-1 bg-rose-500/10 text-rose-400 rounded-full text-xs font-semibold border border-rose-500/20">主題</span>
+                                <span id="modal-year" class="px-3 py-1 bg-slate-800 text-slate-300 rounded-full text-xs font-medium">年份</span>
+                                <span id="modal-duration" class="px-3 py-1 bg-slate-800 text-slate-300 rounded-full text-xs font-medium">時長</span>
+                            </div>
+                            
+                            <h2 class="text-3xl sm:text-4xl font-black text-white" id="modal-title">電影標題</h2>
+                            <h3 class="text-sm sm:text-base text-slate-400 font-light" id="modal-subtitle">英文副標</h3>
+
+                            <!-- Rotten Apples Index details inside modal -->
+                            <div class="grid grid-cols-2 gap-4 py-3 border-y border-slate-800/80 bg-slate-950/30 p-3 rounded-xl">
+                                <div class="flex items-center space-x-3">
+                                    <div class="p-2 bg-slate-900 rounded-xl" id="modal-critic-apple-container">
+                                        <!-- Dynamic apple icon injection -->
+                                        <i class="fas fa-apple-whole text-brand-appleRed text-3xl"></i>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[10px] text-slate-500 uppercase tracking-wider">專業爛蘋果指數</span>
+                                        <span class="text-xl sm:text-2xl font-black text-white" id="modal-rotten-critics">95%</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-3 border-l border-slate-850 pl-4">
+                                    <div class="p-2 bg-slate-900 rounded-xl">
+                                        <i class="fas fa-popcorn text-yellow-500 text-3xl animate-bounce"></i>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[10px] text-slate-500 uppercase tracking-wider">觀眾爆米花指數</span>
+                                        <span class="text-xl sm:text-2xl font-black text-white" id="modal-rotten-audience">88%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 class="text-xs font-semibold text-slate-400 uppercase mb-1">電影大綱</h4>
+                                <p class="text-sm sm:text-base text-slate-300 leading-relaxed font-light" id="modal-description">電影大綱將載入於此...</p>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 pt-1 text-xs">
+                                <div>
+                                    <h4 class="font-semibold text-slate-500 uppercase">導演</h4>
+                                    <p class="text-slate-300 font-medium mt-0.5" id="modal-director">載入中...</p>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-500 uppercase">主要演員</h4>
+                                    <p class="text-slate-300 font-medium mt-0.5 truncate" id="modal-cast">載入中...</p>
+                                </div>
+                            </div>
+
+                            <!-- Interactive Button -->
+                            <div class="flex space-x-2.5 pt-3">
+                                <button id="modal-vote-btn" class="flex-grow bg-gradient-to-r from-brand-500 to-rose-500 text-slate-950 font-bold py-3 rounded-xl hover:shadow-lg hover:shadow-brand-500/10 transition duration-200 text-sm">
+                                    <i class="fas fa-thumbs-up mr-1.5"></i> 推薦這部片
+                                </button>
+                                <button onclick="simulateTrailerPlay()" class="px-5 bg-slate-800 hover:bg-slate-705 text-white rounded-xl font-semibold transition text-sm">
+                                    <i class="fas fa-play mr-1.5"></i> 預告
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MOVIE STILLS GALLERY (劇照集) -->
+                    <div class="mt-8 pt-6 border-t border-slate-800/80">
+                        <h4 class="text-base font-bold mb-3 flex items-center space-x-2">
+                            <i class="fas fa-images text-rose-500"></i>
+                            <span>電影精選劇照 (Movie Stills)</span>
+                        </h4>
+                        <!-- Horizontal Scroll Container -->
+                        <div id="modal-stills-gallery" class="flex space-x-3 overflow-x-auto pb-2 hide-scrollbar scroll-smooth">
+                            <!-- Stills will be dynamically injected here -->
+                        </div>
+                    </div>
+
+                    <!-- Mini Discussion Area -->
+                    <div class="mt-6 pt-6 border-t border-slate-800/80">
+                        <h4 class="text-base font-bold mb-4 flex items-center space-x-2">
+                            <i class="fas fa-comments text-brand-500"></i>
+                            <span>微型討論板</span>
+                        </h4>
+                        <!-- Mini comment box -->
+                        <div class="space-y-4">
+                            <div class="flex space-x-2">
+                                <input type="text" id="modal-comment-input" placeholder="說說你對這部電影與爛蘋果指數的看法..." class="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs sm:text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-brand-500">
+                                <button onclick="submitModalComment()" class="px-4.5 bg-slate-800 hover:bg-brand-500 hover:text-slate-950 text-slate-300 font-bold rounded-xl text-xs sm:text-sm transition">
+                                    發言
+                                </button>
+                            </div>
+                            <div id="modal-comments-list" class="space-y-3.5 max-h-48 overflow-y-auto pr-1">
+                                <!-- Preloaded mini comments -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GLOBAL TOAST MESSAGE SYSTEM -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 pointer-events-none flex flex-col gap-2"></div>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-950 border-t border-slate-900 mt-auto py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-6 border-b border-slate-900 pb-8 mb-8">
+                <div>
+                    <div class="flex items-center justify-center sm:justify-start space-x-2 mb-2">
+                        <div class="bg-gradient-to-tr from-rose-600 to-amber-500 p-1.5 rounded-lg">
+                            <i class="fas fa-apple-whole text-slate-950 text-xs"></i>
+                        </div>
+                        <span class="text-lg font-black tracking-wider text-slate-200">CINEWAVE</span>
+                    </div>
+                    <p class="text-slate-500 text-xs sm:text-sm">最客觀的爛蘋果指數與三大主題頂級電影片單推薦平台。</p>
+                </div>
+                <div class="flex items-center space-x-4 text-slate-400">
+                    <a href="https://github.com" target="_blank" class="hover:text-brand-500 p-2.5 bg-slate-900 rounded-full transition"><i class="fab fa-github text-lg"></i></a>
+                    <a href="#" class="hover:text-brand-500 p-2.5 bg-slate-900 rounded-full transition"><i class="fab fa-twitter text-lg"></i></a>
+                    <a href="#" class="hover:text-brand-500 p-2.5 bg-slate-900 rounded-full transition"><i class="fab fa-instagram text-lg"></i></a>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+                <p>&copy; 2026 CineWave. 本網站架設於 GitHub Pages. 電影資料與劇照僅供學術教育與介紹使用。</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="hover:underline">隱私權政策</a>
+                    <a href="#" class="hover:underline">使用條款</a>
+                    <a href="#" class="hover:underline">聯絡我們</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC & DATABASE -->
+    <script>
+        const moviesDatabase = [
+            // Theme 1: 驚悚懸疑 (Thriller)
+            {
+                id: "thriller-1",
+                title: "寄生上流",
+                subtitle: "Parasite",
+                theme: "thriller",
+                themeLabel: "🔪 驚悚懸疑",
+                year: "2019",
+                duration: "2小時12分鐘",
+                director: "奉俊昊",
+                cast: "宋康昊, 李善均, 曹汝貞",
+                score: 9.2,
+                votes: 2780,
+                rottenCritics: 99,   // Rotten Apples index (Critics)
+                rottenAudience: 90,  // Audience pop-corn
+                bgImage: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=1920", // modern architecture/lux home representation
+                posterImage: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600",
+                desc: "一無所有的基宇一家，靠著偽造學歷與花言巧語成功滲透進入上流富豪朴社長的豪宅工作。原本看似完美的寄生騙局，卻在一夜之間，因為地下室驚人的秘密而失控墮入致命深淵。",
+                stills: [
+                    "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=800", // Luxurious modern living room
+                    "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=800", // Dark stairs / basement vibe
+                    "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?q=80&w=800"  // Heavy rain on window glass
+                ],
+                comments: [
+                    { author: "艾利克斯", content: "半地下室的味道是怎麼都洗不掉的...看完讓人窒息的社會神作！" },
+                    { author: "電影控", content: "爛蘋果 99% 的評價實至名歸，極致精密的劇本編排。" }
+                ]
+            },
+            {
+                id: "thriller-2",
+                title: "隔離島",
+                subtitle: "Shutter Island",
+                theme: "thriller",
+                themeLabel: "🔪 驚悚懸疑",
+                year: "2010",
+                duration: "2小時18分鐘",
+                director: "馬丁·史柯西斯",
+                cast: "李奧納多·狄卡皮歐, 馬克·魯法洛",
+                score: 8.7,
+                votes: 1890,
+                rottenCritics: 69,
+                rottenAudience: 77,
+                bgImage: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1920", // Rocky island / storm
+                posterImage: "https://images.unsplash.com/photo-1509281373149-e957c6296406?q=80&w=600",
+                desc: "聯邦法警泰迪與夥伴奉命前往一座孤立在暴風雨中的「隔離島醫院」，調查一起精神病犯離奇失蹤的案件。然而隨著線索層層抽絲剝繭，泰迪發現島上隱藏著非人道的精神實驗，而他自己竟然也陷入了記憶與幻覺的泥潭。",
+                stills: [
+                    "https://images.unsplash.com/photo-1473163928189-364b2c4e1135?q=80&w=800", // Dark lighthouse foggy coast
+                    "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=800", // Vintage corridors / medical facility
+                    "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?q=80&w=800"  // Smoldering ash and fire illusion
+                ],
+                comments: [
+                    { author: "泰迪", content: "到底是要像一個好人一樣死去，還是像一個怪物一樣活著？" }
+                ]
+            },
+            {
+                id: "thriller-3",
+                title: "控制",
+                subtitle: "Gone Girl",
+                theme: "thriller",
+                themeLabel: "🔪 驚悚懸疑",
+                year: "2014",
+                duration: "2小時29分鐘",
+                director: "大衛·芬奇",
+                cast: "班·艾佛列克, 羅莎蒙·派克",
+                score: 8.9,
+                votes: 2120,
+                rottenCritics: 88,
+                rottenAudience: 87,
+                bgImage: "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1920", // river / blue dark mood
+                posterImage: "https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?q=80&w=600",
+                desc: "在結婚五週年紀念日當天，美麗的愛咪突然從家中離奇消失，現場留有打鬥痕跡。丈夫尼克成為警方的頭號嫌疑犯。隨著愛咪留下的尋寶日記逐步被揭開，一齣充斥著婚姻謊言與高智商反撲的恐怖驚悚棋局正式引爆。",
+                stills: [
+                    "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=800", // Pen writing journal in dim light
+                    "https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800", // Bright flash camera paparazzi
+                    "https://images.unsplash.com/photo-1554034483-04fda0d3507b?q=80&w=800"  // Cold blue empty house kitchen
+                ],
+                comments: [
+                    { author: "婚姻勸退師", content: "這是我看過最有效的「避孕/不婚宣導片」，冷汗直流。" }
+                ]
+            },
+
+            // Theme 2: 科幻冒險 (Sci-Fi)
+            {
+                id: "scifi-1",
+                title: "星際效應",
+                subtitle: "Interstellar",
+                theme: "scifi",
+                themeLabel: "🚀 科幻冒險",
+                year: "2014",
+                duration: "2小時49分鐘",
+                director: "克里斯多福·諾蘭",
+                cast: "馬修·麥康納, 安·海瑟薇",
+                score: 9.3,
+                votes: 3420,
+                rottenCritics: 73,
+                rottenAudience: 86,
+                bgImage: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920",
+                posterImage: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=600",
+                desc: "地球在未來面臨糧食危機與沙塵暴末日。一隊探險家利用新發現的蟲洞進行大膽的星際旅行，旨在跨越黑洞「巨人」為人類尋找新的宜居家園。這是一部愛與重力物理學相互交織的終極史詩。",
+                stills: [
+                    "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=800", // Colorful nebula / outer space
+                    "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=800", // Earth view from satellite orbit
+                    "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=800"  // Lonely planet icy dunes
+                ],
+                comments: [
+                    { author: "重力波", content: "當庫珀在五維空間對過去敲擊摩斯密碼時，我整個人爆哭！" }
+                ]
+            },
+            {
+                id: "scifi-2",
+                title: "沙丘：第二部",
+                subtitle: "Dune: Part Two",
+                theme: "scifi",
+                themeLabel: "🚀 科幻冒險",
+                year: "2024",
+                duration: "2小時46分鐘",
+                director: "丹尼·維勒納夫",
+                cast: "提摩西·夏勒梅, 辛蒂亞, 奧斯汀·巴特勒",
+                score: 9.0,
+                votes: 2150,
+                rottenCritics: 92,
+                rottenAudience: 95,
+                bgImage: "https://images.unsplash.com/photo-1547483238-f400e65ccd56?q=80&w=1920",
+                posterImage: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600",
+                desc: "保羅·亞崔迪在厄拉科斯星球上馴服巨大沙蟲，融入弗瑞曼人部落並蛻變為傳說中的救世主「魁薩茨·哈德拉赫」。他帶領弗瑞曼大軍對皇帝和哈肯能家族展開史詩反擊。",
+                stills: [
+                    "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=800", // Golden sands dessert
+                    "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800", // Minimalist dark futuristic interior
+                    "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800"  // Ancient burning temple torches
+                ],
+                comments: [
+                    { author: "香料之王", content: "沙蟲奔馳的低音重低音直接震碎我的靈魂！這才是電影院存在的理由。" }
+                ]
+            },
+            {
+                id: "scifi-3",
+                title: "駭客任務",
+                subtitle: "The Matrix",
+                theme: "scifi",
+                themeLabel: "🚀 科幻冒險",
+                year: "1999",
+                duration: "2小時16分鐘",
+                director: "華卓斯基姊妹",
+                cast: "基努·李維, 勞倫斯·費許朋",
+                score: 9.1,
+                votes: 2490,
+                rottenCritics: 87,
+                rottenAudience: 85,
+                bgImage: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1920",
+                posterImage: "https://images.unsplash.com/photo-1544256718-3bcf237f3974?q=80&w=600",
+                desc: "電腦工程師尼歐發現自己所處的世界實際上是一個名為「母體」的虛擬系統。在神秘導師墨菲斯的引導下，他選擇吞下紅色藥丸，甦醒過來，踏上對抗支配人類的AI機械軍團的救世主之路。",
+                stills: [
+                    "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=800", // Green matrix digital rain
+                    "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=800", // Cyberpunk terminal screens
+                    "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800"  // Old retro wired telephone
+                ],
+                comments: [
+                    { author: "紅藥丸信徒", content: "哪怕在2026年來看，這部的哲學思想和子彈時間美學依然是神一般的頂峰。" }
+                ]
+            },
+
+            // Theme 3: 愛情浪漫 (Romance)
+            {
+                id: "romance-1",
+                title: "樂來越愛你",
+                subtitle: "La La Land",
+                theme: "romance",
+                themeLabel: "💖 愛情浪漫",
+                year: "2016",
+                duration: "2小時08分鐘",
+                director: "達米恩·查澤雷",
+                cast: "雷恩·葛斯林, 艾瑪·史東",
+                score: 8.8,
+                votes: 2110,
+                rottenCritics: 91,
+                rottenAudience: 81,
+                bgImage: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1920",
+                posterImage: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=600",
+                desc: "在充滿夢想與心碎的洛杉磯。追求極致爵士樂復興的賽巴斯汀與渴望在試鏡中發光的蜜亞相遇。在美妙的音樂歌舞中，他們相愛、相知並互相扶持。然而，隨著各自事業起飛，現實生活的拉扯考驗著他們的選擇。",
+                stills: [
+                    "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=800", // Purple twilight sky lamp post
+                    "https://images.unsplash.com/photo-1511192336575-5a79af67a629?q=80&w=800", // Classic grand piano in dark club
+                    "https://images.unsplash.com/photo-1484755560693-a4074577af3a?q=80&w=800"  // Spinning vinyl record turntable
+                ],
+                comments: [
+                    { author: "塞巴斯爵士", content: "最後那十分鐘的無言想像，完美呈現了愛情裡最美也是最痛的遺憾。" }
+                ]
+            },
+            {
+                id: "romance-2",
+                title: "真愛每一天",
+                subtitle: "About Time",
+                theme: "romance",
+                themeLabel: "💖 愛情浪漫",
+                year: "2013",
+                duration: "2小時03分鐘",
+                director: "李察·寇蒂斯",
+                cast: "多姆納爾·格里森, 瑞秋·麥亞當斯",
+                score: 8.9,
+                votes: 1980,
+                rottenCritics: 69,
+                rottenAudience: 81,
+                bgImage: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1920",
+                posterImage: "https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?q=80&w=600",
+                desc: "提姆在滿21歲時被父親告知家族中的男性都擁有穿越時間回到自己過去的能力。他決定用這個驚天秘術去追尋一生的摯愛瑪麗，經歷數次「完美重來」後，他逐漸懂得如何體會生命中最平凡卻美好的一天。",
+                stills: [
+                    "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=800", // Wedding ring bouquet
+                    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800", // British coastal seashore
+                    "https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=800"  // Cozy warm bookshelf library
+                ],
+                comments: [
+                    { author: "時間旅人", content: "這表面上是愛情喜劇，骨子裡卻是教我們如何熱愛生命的哲學大師課。" }
+                ]
+            },
+            {
+                id: "romance-3",
+                title: "真愛挑日子",
+                subtitle: "One Day",
+                theme: "romance",
+                themeLabel: "💖 愛情浪漫",
+                year: "2011",
+                duration: "1小時47分鐘",
+                director: "瓏·薛爾菲格",
+                cast: "安·海瑟薇, 吉姆·史特格斯",
+                score: 8.4,
+                votes: 1290,
+                rottenCritics: 84,
+                rottenAudience: 85,
+                bgImage: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1920",
+                posterImage: "https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?q=80&w=600",
+                desc: "艾瑪和達斯汀在1988年大學畢業典禮當天相識。在接下來的二十年裡，他們約定每年只在7月15日這一天見面，共同見證彼此生命中的起落、挫敗與愛情。直到驀然回首，才發現對方的存在超越了一切糾葛。",
+                stills: [
+                    "https://images.unsplash.com/photo-1449034446853-66c86144b0ad?q=80&w=800", // Golden Gate Bridge evening mood
+                    "https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=80&w=800", // Old vintage typewriter desk
+                    "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?q=80&w=800"  // Cozy Paris city street cafe
+                ],
+                comments: [
+                    { author: "艾蜜莉", content: "友情與愛情的模糊地帶。每一次與你相聚，都是我一年中最期盼的那天。" }
+                ]
+            }
+        ];
+
+        let userReviews = [
+            {
+                id: "rev-1",
+                movieTitle: "寄生上流",
+                author: "迷霧大腦",
+                ratingCritics: 100,
+                ratingAudience: 92,
+                title: "【極致驚悚】階級如重力，唯有墜落才知地下室有多深",
+                date: "2026-06-05",
+                content: "《寄生上流》之所以在爛蘋果拿下近滿分的99%神級評價，就在於奉俊昊將「階級對比」化為令人毛骨悚然的驚悚元素。沒有任何鬼魂，也沒有電鋸狂人，真正的怪物是那漫天大雨沖刷下溢出的化糞池污水，以及有錢人對窮人身上「地下室霉味」無意識的排斥。轉折點在地下室暗門打開那一幕，直接將黑色幽默瞬間拉入頂級驚悚地獄。"
+            },
+            {
+                id: "rev-2",
+                movieTitle: "沙丘：第二部",
+                author: "銀河帝國史官",
+                ratingCritics: 95,
+                ratingAudience: 98,
+                title: "【科幻史詩】大銀幕美學與救世主預言的完美風暴",
+                date: "2026-06-08",
+                content: "維勒納夫導演用絕對冷冽的科幻構圖與漢斯·季默超越極限的沙丘共鳴低音，把法蘭克赫伯特那本被認為不可能改編的小說完美呈現在世人面前。在爛蘋果指數中，95% 的觀眾評價證明了本作不僅僅是極客的狂歡，它是屬於全人類的大銀幕視覺洗禮。保羅在落日下帶領弗瑞曼大軍的畫面，將名留影史。"
+            },
+            {
+                id: "rev-3",
+                movieTitle: "樂來越愛你",
+                author: "黑膠音樂狂",
+                ratingCritics: 90,
+                ratingAudience: 85,
+                title: "【愛情與現實】致那些在星空下起舞、卻在日常中走散的笨蛋們",
+                date: "2026-06-01",
+                content: "達米恩·查澤雷將歌舞片的浪漫發揮到了極致。電影前半段的暖紫色調是洛杉磯夢想的包裝，而後半段的枯黃與灰色調則是事業與愛情拉扯的殘酷現實。在爛蘋果中，雖然有少數人吐槽其對傳統爵士的定義，但高達 91% 的專業推薦率證明：那最後一首長達十分鐘、沒有一句台詞的「如果當初我們能重來」鋼琴協奏，擊碎了全世界無數影迷的心。"
+            }
+        ];
+
+        // App Core State
+        const state = {
+            currentTab: 'home',
+            themeFilter: 'all',
+            searchQuery: '',
+            sortBy: 'score',
+            votedMovies: new Set(),
+            activeMovieId: null
+        };
+
+        window.onload = function() {
+            renderFeaturedGrid();
+            renderRankings();
+            renderReviews();
+            populateMovieDropdown();
+            updateStatsUI();
+            setupHeroSpotlight();
+        };
+
+        // SPA Tab Switcher
+        function switchTab(tabId) {
+            state.currentTab = tabId;
+            
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(element => {
+                element.classList.add('hidden');
+                element.classList.remove('opacity-100');
+            });
+            
+            // Show target
+            const activeTabContent = document.getElementById(`tab-content-${tabId}`);
+            activeTabContent.classList.remove('hidden');
+            setTimeout(() => {
+                activeTabContent.classList.add('opacity-100');
+            }, 50);
+
+            // Update Navigation Menu Styles
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-brand-500', 'bg-slate-900/50');
+                btn.classList.add('text-slate-400', 'hover:text-white', 'hover:bg-slate-900');
+            });
+            
+            const activeNavBtn = document.getElementById(`nav-${tabId}`);
+            if (activeNavBtn) {
+                activeNavBtn.classList.remove('text-slate-400', 'hover:text-white', 'hover:bg-slate-900');
+                activeNavBtn.classList.add('text-brand-500', 'bg-slate-900/50');
+            }
+
+            // Smooth scroll back to top on switch
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Toggle Mobile Menu Container
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('menu-icon');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                menu.classList.add('hidden');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        }
+
+        // Setup Spotlight Feature randomly on load
+        function setupHeroSpotlight() {
+            const heroPool = moviesDatabase.slice(0, 5);
+            const randomIndex = Math.floor(Math.random() * heroPool.length);
+            const selected = heroPool[randomIndex];
+            
+            document.getElementById('hero-title').innerHTML = `${selected.title} <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-rose-500">${selected.subtitle}</span>`;
+            document.getElementById('hero-desc').innerText = selected.desc;
+            document.getElementById('hero-bg').style.backgroundImage = `url('${selected.bgImage}')`;
+            
+            // Set Rotten Badge inside hero banner
+            document.getElementById('hero-rotten-critics').innerText = `${selected.rottenCritics}%`;
+            document.getElementById('hero-rotten-audience').innerText = `${selected.rottenAudience}%`;
+            
+            // Save active hero ID globally
+            window.currentHeroId = selected.id;
+        }
+
+        function openHeroDetail() {
+            if (window.currentHeroId) {
+                openModal(window.currentHeroId);
+            } else {
+                openModal('scifi-2');
+            }
+        }
+
+        function renderFeaturedGrid() {
+            const container = document.getElementById('movie-grid-container');
+            container.innerHTML = '';
+
+            const themes = {
+                thriller: { name: "🔪 驚悚懸疑 Thriller", desc: "遊走在理智與瘋狂的邊緣，挑戰心理防線的極致張力之作。" },
+                scifi: { name: "🚀 科幻冒險 Sci-Fi", desc: "橫跨時間、星際與AI維度的宏大預言，探索未來可能模樣。" },
+                romance: { name: "💖 愛情浪漫 Romance", desc: "雋永溫柔的情感篇章，那些銘刻在記憶長河中的動人悸動。" }
+            };
+
+            Object.keys(themes).forEach(themeKey => {
+                // If specific tab filter is set
+                if (state.themeFilter !== 'all' && state.themeFilter !== themeKey) return;
+
+                let filteredList = moviesDatabase.filter(m => m.theme === themeKey);
+                
+                // If search query is entered
+                if (state.searchQuery.trim() !== '') {
+                    const q = state.searchQuery.toLowerCase();
+                    filteredList = filteredList.filter(m => 
+                        m.title.toLowerCase().includes(q) || 
+                        m.subtitle.toLowerCase().includes(q) ||
+                        m.director.toLowerCase().includes(q) ||
+                        m.cast.toLowerCase().includes(q)
+                    );
+                }
+
+                if (filteredList.length === 0) return;
+
+                const section = document.createElement('div');
+                section.className = "space-y-6";
+                
+                section.innerHTML = `
+                    <div class="border-l-4 border-rose-500 pl-4 py-1.5">
+                        <h3 class="text-2xl font-black text-white tracking-wide">${themes[themeKey].name}</h3>
+                        <p class="text-xs sm:text-sm text-slate-400 mt-1.5 font-light">${themes[themeKey].desc}</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                        ${filteredList.map(movie => {
+                            // Decide Apple Icon based on score
+                            const appleIconColor = movie.rottenCritics >= 75 ? 'text-brand-appleRed text-glow-red' : 'text-brand-appleGreen';
+                            
+                            return `
+                                <div onclick="openModal('${movie.id}')" class="group bg-slate-900 border border-slate-900 hover:border-slate-800 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col h-full">
+                                    <!-- Image Block -->
+                                    <div class="relative aspect-video w-full overflow-hidden bg-slate-950">
+                                        <img src="${movie.bgImage}" alt="${movie.title}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" onerror="this.src='https://placehold.co/600x400/1e293b/ffffff?text=${encodeURIComponent(movie.title)}'">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/10 to-transparent"></div>
+                                        <div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+                                            <!-- Theme / Year Label -->
+                                            <span class="px-2.5 py-1 bg-slate-950/80 backdrop-blur-md rounded-lg text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                                ${movie.year}
+                                            </span>
+                                            <!-- Rotten Critics Label -->
+                                            <span class="px-2.5 py-1.5 bg-slate-950/90 backdrop-blur-md rounded-lg text-xs font-black flex items-center space-x-1.5 border border-slate-800">
+                                                <i class="fas fa-apple-whole ${appleIconColor} text-sm"></i>
+                                                <span class="text-slate-100">${movie.rottenCritics}%</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Meta details -->
+                                    <div class="p-6 flex flex-col flex-grow space-y-2">
+                                        <div class="flex items-center justify-between">
+                                            <h4 class="text-xl font-bold group-hover:text-brand-500 transition duration-150">${movie.title}</h4>
+                                            <span class="text-xs font-bold text-brand-500 flex items-center">
+                                                <i class="fas fa-star mr-1 text-xs"></i>${movie.score.toFixed(1)}
+                                            </span>
+                                        </div>
+                                        <p class="text-xs text-slate-400 italic font-light truncate">${movie.subtitle}</p>
+                                        <p class="text-xs sm:text-sm text-slate-400 line-clamp-3 leading-relaxed font-light flex-grow pt-2">${movie.desc}</p>
+                                        
+                                        <!-- Rotten Audience vs Critics Indicator -->
+                                        <div class="grid grid-cols-2 gap-2 pt-4 mt-2 border-t border-slate-800/80 text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                                            <div class="flex items-center space-x-1">
+                                                <i class="fas fa-apple-whole ${movie.rottenCritics >= 75 ? 'text-brand-appleRed' : 'text-brand-appleGreen'}"></i>
+                                                <span>鮮度: ${movie.rottenCritics}%</span>
+                                            </div>
+                                            <div class="flex items-center space-x-1 border-l border-slate-850 pl-2">
+                                                <i class="fas fa-popcorn text-yellow-500"></i>
+                                                <span>爆米花: ${movie.rottenAudience}%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+                container.appendChild(section);
+            });
+
+            // Empty results block
+            if (container.children.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-20 bg-slate-900/20 border border-slate-900 rounded-2xl">
+                        <i class="fas fa-search-minus text-4xl text-slate-600 mb-4"></i>
+                        <p class="text-lg text-slate-400 font-light">找不到符合搜尋條件的電影，請試試看其他關鍵字！</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Apply theme filters
+        function setThemeFilter(themeKey) {
+            state.themeFilter = themeKey;
+            
+            document.querySelectorAll('.theme-tab-btn').forEach(btn => {
+                btn.className = "theme-tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 bg-slate-950 border border-slate-850 text-slate-400 hover:text-white";
+            });
+
+            const activeBtn = document.querySelector(`.theme-tab-btn[data-theme="${themeKey}"]`);
+            if (activeBtn) {
+                activeBtn.className = "theme-tab-btn px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 bg-brand-500 text-slate-950";
+            }
+
+            renderFeaturedGrid();
+        }
+
+        function filterMovies() {
+            state.searchQuery = document.getElementById('search-input').value;
+            renderFeaturedGrid();
+        }
+
+        function renderRankings() {
+            const listContainer = document.getElementById('ranking-list');
+            listContainer.innerHTML = '';
+
+            const sortedMovies = [...moviesDatabase];
+            state.sortBy = document.getElementById('sort-select').value;
+            
+            if (state.sortBy === 'score') {
+                sortedMovies.sort((a, b) => b.score - a.score);
+            } else if (state.sortBy === 'rottenCritics') {
+                sortedMovies.sort((a, b) => b.rottenCritics - a.rottenCritics);
+            } else if (state.sortBy === 'votes') {
+                sortedMovies.sort((a, b) => b.votes - a.votes);
+            }
+
+            const maxCineScore = 10;
+            const maxRotten = 100;
+            const maxVotes = Math.max(...moviesDatabase.map(m => m.votes));
+
+            sortedMovies.forEach((movie, index) => {
+                const rank = index + 1;
+                
+                let medalBadge = '';
+                let rankBackground = 'bg-slate-900/40 border-slate-900/80 hover:border-slate-800';
+                
+                if (rank === 1) {
+                    medalBadge = '<span class="bg-gradient-to-r from-amber-400 to-amber-600 text-slate-950 px-3 py-1.5 rounded-xl font-black shadow-lg shadow-amber-500/20 text-xs flex items-center gap-1"><i class="fas fa-crown"></i> 霸主</span>';
+                    rankBackground = 'bg-gradient-to-r from-slate-900 via-rose-950/10 to-slate-900 border-rose-500/20 hover:border-rose-500/40';
+                } else if (rank === 2) {
+                    medalBadge = '<span class="bg-gradient-to-r from-slate-300 to-slate-500 text-slate-950 px-2.5 py-1 rounded-lg font-bold text-xs">傑出</span>';
+                } else if (rank === 3) {
+                    medalBadge = '<span class="bg-gradient-to-r from-amber-600 to-amber-800 text-slate-100 px-2.5 py-1 rounded-lg font-bold text-xs">佳作</span>';
+                }
+
+                const userVoted = state.votedMovies.has(movie.id);
+                const voteBtnClass = userVoted 
+                    ? "bg-brand-500 text-slate-950 border-brand-500 cursor-default font-black" 
+                    : "bg-slate-950 hover:bg-slate-900 border-slate-800 text-slate-300 hover:text-brand-500 hover:border-brand-500/50";
+
+                // Progress math based on sorting metric
+                let metricPercentage = 0;
+                let displayLabel = '';
+                
+                if (state.sortBy === 'score') {
+                    metricPercentage = (movie.score / maxCineScore) * 100;
+                    displayLabel = `CineWave 影迷評分: ${movie.score.toFixed(1)} ★`;
+                } else if (state.sortBy === 'rottenCritics') {
+                    metricPercentage = (movie.rottenCritics / maxRotten) * 100;
+                    displayLabel = `爛蘋果專業鮮度: ${movie.rottenCritics}%`;
+                } else {
+                    metricPercentage = (movie.votes / maxVotes) * 100;
+                    displayLabel = `影迷累積推薦票數: ${movie.votes} 票`;
+                }
+
+                const item = document.createElement('div');
+                item.className = `flex flex-col md:flex-row items-center gap-6 p-6 rounded-2xl border transition-all duration-300 ${rankBackground}`;
+                
+                item.innerHTML = `
+                    <!-- Rank Indicator -->
+                    <div class="flex items-center justify-between w-full md:w-auto md:space-x-4">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-4xl sm:text-5xl font-black text-slate-700 italic tracking-tighter w-12 text-center select-none leading-none">${rank.toString().padStart(2, '0')}</span>
+                            <div class="md:hidden">${medalBadge}</div>
+                        </div>
+                        <div class="md:hidden">
+                            <button onclick="castVote('${movie.id}', event)" class="px-4 py-2 border rounded-xl text-xs font-bold transition flex items-center space-x-1 ${voteBtnClass}">
+                                <i class="${userVoted ? 'fas' : 'far'} fa-thumbs-up"></i>
+                                <span>${userVoted ? '已投票' : '推薦'}</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Poster preview -->
+                    <div class="w-full sm:w-24 h-36 flex-shrink-0 cursor-pointer overflow-hidden rounded-xl bg-slate-950 hidden sm:block" onclick="openModal('${movie.id}')">
+                        <img src="${movie.posterImage}" alt="${movie.title}" class="w-full h-full object-cover hover:scale-105 transition duration-300" onerror="this.src='https://placehold.co/100x150/1e293b/ffffff?text=${encodeURIComponent(movie.title)}'">
+                    </div>
+
+                    <!-- Meta information -->
+                    <div class="flex-grow w-full space-y-2">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center space-x-3">
+                                <h4 class="text-xl sm:text-2xl font-black text-white cursor-pointer hover:text-brand-500 transition" onclick="openModal('${movie.id}')">${movie.title}</h4>
+                                <span class="hidden md:inline">${medalBadge}</span>
+                            </div>
+                            <span class="text-xs font-bold text-slate-500 tracking-wider">${movie.themeLabel}</span>
+                        </div>
+                        <p class="text-xs text-slate-400 font-light truncate max-w-lg mb-1">${movie.subtitle} (${movie.year})</p>
+                        
+                        <!-- Mini visual bar -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs text-slate-400 font-bold uppercase tracking-wide">
+                                <span>${displayLabel}</span>
+                                <span>${Math.round(metricPercentage)}%</span>
+                            </div>
+                            <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-900">
+                                <div class="h-full bg-gradient-to-r from-rose-500 to-brand-500 rounded-full transition-all duration-500" style="width: ${metricPercentage}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Mini indicator block -->
+                        <div class="flex items-center space-x-4 pt-1 text-[11px] text-slate-500">
+                            <span class="flex items-center space-x-1">
+                                <i class="fas fa-apple-whole ${movie.rottenCritics >= 75 ? 'text-brand-appleRed' : 'text-brand-appleGreen'}"></i>
+                                <span>專業鮮度: ${movie.rottenCritics}%</span>
+                            </span>
+                            <span class="flex items-center space-x-1">
+                                <i class="fas fa-popcorn text-yellow-500"></i>
+                                <span>爆米花: ${movie.rottenAudience}%</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Vote Button Desktop -->
+                    <div class="hidden md:block flex-shrink-0 text-center">
+                        <button onclick="castVote('${movie.id}', event)" class="px-5 py-3 border rounded-xl text-xs font-bold uppercase tracking-wider tracking-wide transition flex items-center justify-center space-x-2 ${voteBtnClass}">
+                            <i class="${userVoted ? 'fas' : 'far'} fa-thumbs-up"></i>
+                            <span>${userVoted ? '已投票推薦' : '給予推薦票'}</span>
+                        </button>
+                    </div>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        // Interactive cast vote trigger
+        function castVote(movieId, event) {
+            if (event) event.stopPropagation();
+            
+            if (state.votedMovies.has(movieId)) {
+                showToast("您已為此片投過票，每屆限投一票！", "info");
+                return;
+            }
+
+            const movie = moviesDatabase.find(m => m.id === movieId);
+            if (movie) {
+                movie.votes += 1;
+                state.votedMovies.add(movieId);
+                
+                showToast(`推薦成功！《${movie.title}》已獲得推薦累計數。`, "success");
+                
+                // Update UI renders
+                renderRankings();
+                updateStatsUI();
+                
+                // If Modal is open, keep modal synced
+                if (state.activeMovieId === movieId) {
+                    const mBtn = document.getElementById('modal-vote-btn');
+                    mBtn.className = "flex-grow bg-brand-500 text-slate-950 font-black py-3 rounded-xl cursor-default text-sm";
+                    mBtn.innerHTML = '<i class="fas fa-thumbs-up mr-1.5"></i> 已投票推薦';
+                }
+            }
+        }
+
+        function renderReviews() {
+            const feed = document.getElementById('reviews-feed');
+            feed.innerHTML = '';
+
+            document.getElementById('total-reviews-badge').innerText = `共 ${userReviews.length} 篇精選點評`;
+
+            userReviews.forEach(rev => {
+                const totalRottenIndex = Math.round((rev.ratingCritics + rev.ratingAudience) / 2);
+                const appleColorClass = totalRottenIndex >= 75 ? 'text-brand-appleRed text-glow-red' : 'text-brand-appleGreen';
+                
+                const card = document.createElement('article');
+                card.className = "bg-slate-900/60 p-6 sm:p-8 rounded-2xl border border-slate-900/80 space-y-4 hover:border-slate-800 transition duration-200";
+                
+                card.innerHTML = `
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-full bg-slate-950 flex items-center justify-center text-rose-500 font-black border border-slate-800 uppercase">
+                                ${rev.author.charAt(0)}
+                            </div>
+                            <div>
+                                <span class="block font-bold text-slate-200 text-sm">${rev.author}</span>
+                                <span class="block text-slate-500 text-xs">發表於 ${rev.date}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="px-3 py-1 bg-rose-500/10 text-rose-400 border border-rose-500/15 rounded-full text-xs font-bold">
+                                電影：《${rev.movieTitle}》
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-lg sm:text-xl font-bold text-white leading-snug">${rev.title}</h4>
+                            <div class="flex flex-col items-end text-xs font-bold leading-none">
+                                <span class="text-brand-appleRed flex items-center mb-1">
+                                    <i class="fas fa-apple-whole mr-1"></i> ${rev.ratingCritics}% Critics
+                                </span>
+                                <span class="text-yellow-500 flex items-center">
+                                    <i class="fas fa-popcorn mr-1"></i> ${rev.ratingAudience}% Popcorn
+                                </span>
+                            </div>
+                        </div>
+                        <p class="text-slate-300 text-sm sm:text-base leading-relaxed font-light whitespace-pre-line">${rev.content}</p>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-950 flex items-center justify-between text-xs text-slate-500">
+                        <span class="hover:text-brand-500 cursor-pointer flex items-center gap-1.5" onclick="likeReview('${rev.id}')">
+                            <i class="far fa-heart"></i> 這篇爛蘋果評論很有用
+                        </span>
+                        <span class="text-slate-700 bg-slate-950/40 px-2 py-0.5 rounded-full">已通過安全驗證</span>
+                    </div>
+                `;
+                feed.appendChild(card);
+            });
+        }
+
+        // Prepopulate Select Options inside Form
+        function populateMovieDropdown() {
+            const dropdown = document.getElementById('review-movie-select');
+            dropdown.innerHTML = '<option value="" disabled selected>請選擇欲評論的電影...</option>';
+            
+            moviesDatabase.forEach(movie => {
+                const opt = document.createElement('option');
+                opt.value = movie.title;
+                opt.innerText = `${movie.title} (${movie.subtitle})`;
+                dropdown.appendChild(opt);
+            });
+        }
+
+        // Handle Review Submission
+        function handleReviewSubmit(e) {
+            e.preventDefault();
+            
+            const movieTitle = document.getElementById('review-movie-select').value;
+            const critics = parseInt(document.getElementById('review-critics-score').value);
+            const audience = parseInt(document.getElementById('review-audience-score').value);
+            const author = document.getElementById('review-author').value;
+            const title = document.getElementById('review-title').value;
+            const content = document.getElementById('review-content').value;
+
+            if (!movieTitle) {
+                showToast("請先選擇您要發表影評的電影！", "error");
+                return;
+            }
+
+            const newReview = {
+                id: "rev-" + Date.now(),
+                movieTitle: movieTitle,
+                author: author,
+                ratingCritics: critics,
+                ratingAudience: audience,
+                title: title,
+                date: new Date().toISOString().split('T')[0],
+                content: content
+            };
+
+            userReviews.unshift(newReview);
+            
+            // Re-render
+            renderReviews();
+            document.getElementById('review-form').reset();
+            
+            showToast("影評成功發表！已即時整合到推薦首頁。", "success");
+            
+            // Scroll feed smoothly
+            document.getElementById('reviews-feed').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function likeReview(id) {
+            showToast("感謝您的反饋，已回傳此影評的有用權重！", "success");
+        }
+
+        function openModal(movieId) {
+            const movie = moviesDatabase.find(m => m.id === movieId);
+            if (!movie) return;
+
+            state.activeMovieId = movieId;
+
+            // Base visual fills
+            document.getElementById('modal-banner').style.backgroundImage = `url('${movie.bgImage}')`;
+            document.getElementById('modal-poster').src = movie.posterImage;
+            document.getElementById('modal-poster').alt = movie.title;
+            document.getElementById('modal-theme').innerText = movie.themeLabel;
+            document.getElementById('modal-year').innerText = movie.year + " 年";
+            document.getElementById('modal-duration').innerText = movie.duration;
+            document.getElementById('modal-title').innerText = movie.title;
+            document.getElementById('modal-subtitle').innerText = movie.subtitle;
+            document.getElementById('modal-description').innerText = movie.desc;
+            document.getElementById('modal-director').innerText = movie.director;
+            document.getElementById('modal-cast').innerText = movie.cast;
+
+            // Populate Rotten Apples values inside modal
+            document.getElementById('modal-rotten-critics').innerText = `${movie.rottenCritics}%`;
+            document.getElementById('modal-rotten-audience').innerText = `${movie.rottenAudience}%`;
+
+            // Adjust Apple Icon color depending on Critics score
+            const criticAppleContainer = document.getElementById('modal-critic-apple-container');
+            if (movie.rottenCritics >= 75) {
+                criticAppleContainer.innerHTML = `<i class="fas fa-apple-whole text-brand-appleRed text-3xl text-glow-red animate-pulse"></i>`;
+            } else {
+                criticAppleContainer.innerHTML = `<i class="fas fa-apple-whole text-brand-appleGreen text-3xl"></i>`;
+            }
+
+            // Sync Vote button status
+            const mBtn = document.getElementById('modal-vote-btn');
+            const userVoted = state.votedMovies.has(movieId);
+            
+            if (userVoted) {
+                mBtn.className = "flex-grow bg-brand-500 text-slate-950 font-black py-3 rounded-xl cursor-default text-sm";
+                mBtn.innerHTML = '<i class="fas fa-thumbs-up mr-1.5"></i> 已投票推薦';
+                mBtn.onclick = null;
+            } else {
+                mBtn.className = "flex-grow bg-gradient-to-r from-brand-500 to-rose-500 text-slate-950 font-bold py-3 rounded-xl hover:shadow-lg hover:shadow-brand-500/15 transition duration-200 text-sm";
+                mBtn.innerHTML = '<i class="fas fa-thumbs-up mr-1.5"></i> 推薦這部電影';
+                mBtn.onclick = function() { castVote(movieId); };
+            }
+
+            // Render Movie Stills Gallery (劇照集)
+            const stillsGallery = document.getElementById('modal-stills-gallery');
+            stillsGallery.innerHTML = '';
+            
+            if (movie.stills && movie.stills.length > 0) {
+                movie.stills.forEach((stillUrl, idx) => {
+                    const imgWrapper = document.createElement('div');
+                    imgWrapper.className = "min-w-[260px] w-[260px] h-[150px] sm:min-w-[320px] sm:w-[320px] sm:h-[180px] rounded-xl overflow-hidden bg-slate-950 border border-slate-800 flex-shrink-0 cursor-pointer group/still relative";
+                    
+                    imgWrapper.innerHTML = `
+                        <img src="${stillUrl}" alt="${movie.title} 相關劇照 ${idx+1}" class="w-full h-full object-cover transition-transform duration-500 group-hover/still:scale-105" onerror="this.src='https://placehold.co/400x250/1e293b/ffffff?text=${encodeURIComponent(movie.title)}+劇照'">
+                        <div class="absolute inset-0 bg-slate-950/20 opacity-0 group-hover/still:opacity-100 transition duration-300 flex items-center justify-center">
+                            <span class="bg-slate-900/80 px-2.5 py-1 text-[11px] font-bold rounded-lg tracking-wider border border-slate-700">劇照 ${idx+1}</span>
+                        </div>
+                    `;
+                    stillsGallery.appendChild(imgWrapper);
+                });
+            } else {
+                stillsGallery.innerHTML = '<p class="text-xs text-slate-500 italic py-2">目前尚無相關劇照資料。</p>';
+            }
+
+            // Render Discussion Board for movie
+            renderModalComments(movie);
+
+            // Pop Animation
+            const modalEl = document.getElementById('movie-modal');
+            const boxEl = document.getElementById('modal-box');
+            
+            modalEl.classList.remove('hidden');
+            setTimeout(() => {
+                boxEl.classList.remove('scale-95', 'opacity-0');
+                boxEl.classList.add('scale-100', 'opacity-100');
+            }, 50);
+
+            // Lock screen scroll
+            document.body.style.overflow = "hidden";
+        }
+
+        // Close Detail Modal
+        function closeModal() {
+            const modalEl = document.getElementById('movie-modal');
+            const boxEl = document.getElementById('modal-box');
+            
+            boxEl.classList.remove('scale-100', 'opacity-100');
+            boxEl.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modalEl.classList.add('hidden');
+                document.body.style.overflow = "auto";
+            }, 150);
+        }
+
+        // Render Discussion List inside modal
+        function renderModalComments(movie) {
+            const list = document.getElementById('modal-comments-list');
+            list.innerHTML = '';
+
+            if (!movie.comments || movie.comments.length === 0) {
+                list.innerHTML = '<p class="text-xs text-slate-600 italic py-2">目前尚無影迷發言，快來寫下第一個觀點吧！</p>';
+                return;
+            }
+
+            movie.comments.forEach(cmt => {
+                const cBox = document.createElement('div');
+                cBox.className = "bg-slate-950 border border-slate-900 rounded-xl p-3.5 space-y-1";
+                cBox.innerHTML = `
+                    <div class="flex items-center justify-between text-[11px]">
+                        <span class="font-bold text-slate-400">${cmt.author}</span>
+                        <span class="text-slate-600 font-medium">剛剛</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-300 font-light leading-relaxed">${cmt.content}</p>
+                `;
+                list.appendChild(cBox);
+            });
+        }
+
+        // Submit quick comment on active modal
+        function submitModalComment() {
+            const input = document.getElementById('modal-comment-input');
+            const val = input.value.trim();
+            if (!val) return;
+
+            const movie = moviesDatabase.find(m => m.id === state.activeMovieId);
+            if (movie) {
+                if (!movie.comments) movie.comments = [];
+                
+                movie.comments.unshift({
+                    author: "匿名影迷",
+                    content: val
+                });
+
+                input.value = '';
+                renderModalComments(movie);
+                showToast("快評成功發布到此電影微看板！", "success");
+            }
+        }
+
+        // Fake player action
+        function simulateTrailerPlay() {
+            showToast("🎬 正為您生成劇院播放管道中...請於後端專案中整合 YouTube 播放框架！", "info");
+        }
+
+        // Total Votes Accumulator UI
+        function updateStatsUI() {
+            const sumVotes = moviesDatabase.reduce((total, m) => total + m.votes, 0);
+            const counter = document.getElementById('total-votes-count');
+            if (counter) {
+                counter.innerText = `${sumVotes.toLocaleString()}+`;
+            }
+        }
+
+        // STATEFUL DYNAMIC TOAST MESSAGE CONTROLLER
+        function showToast(message, type = "success") {
+            const container = document.getElementById('toast-container');
+            
+            const toast = document.createElement('div');
+            toast.className = "flex items-center space-x-3 bg-slate-900/95 border border-slate-850 text-slate-200 px-5 py-4 rounded-xl shadow-2xl backdrop-blur-md pointer-events-auto transform translate-y-4 opacity-0 transition-all duration-300 max-w-sm";
+            
+            let icon = '<i class="fas fa-check-circle text-emerald-500 text-lg"></i>';
+            if (type === "error") {
+                icon = '<i class="fas fa-exclamation-circle text-rose-500 text-lg"></i>';
+            } else if (type === "info") {
+                icon = '<i class="fas fa-info-circle text-brand-500 text-lg animate-bounce"></i>';
+            }
+
+            toast.innerHTML = `
+                ${icon}
+                <span class="text-xs sm:text-sm font-semibold leading-relaxed">${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            // Toast animation In
+            setTimeout(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            }, 50);
+
+            // Toast animation Out
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 4500);
+        }
+    </script>
+</body>
+</html>
