@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CineWave - 電影驚悚、科幻、愛情三大主題排行</title>
   
-  <!-- ================= GA4 追蹤代碼 (Google Tag) ================= -->
+  <!-- ================= GA4 追蹤代碼 (Google Tag) - 保持在背景運作，不在前台顯示 ================= -->
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-QWBRZPQM2L"></script>
   <script>
@@ -15,7 +15,7 @@
 
     gtag('config', 'G-QWBRZPQM2L');
   </script>
-  <!-- ============================================================= -->
+  <!-- ========================================================================================== -->
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -76,7 +76,7 @@
       <!-- Logo -->
       <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('thriller')">
         <span class="text-3xl font-black tracking-wider bg-gradient-to-r from-brand-primary via-red-500 to-amber-500 bg-clip-text text-transparent flex items-center">
-          CINEWAVE <span class="ml-2 text-xs py-1 px-2 bg-brand-primary/10 text-brand-primary rounded-full border border-brand-primary/20">GA4 已啟用</span>
+          CINEWAVE
         </span>
       </div>
       
@@ -93,13 +93,14 @@
         </button>
       </nav>
 
-      <!-- GA4 狀態指示 -->
+      <!-- 右側收藏清單狀態 (取代原先的 GA4 視覺代碼指示，讓介面更精緻實用) -->
       <div class="flex items-center space-x-3">
-        <span class="relative flex h-3.5 w-3.5">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
-        </span>
-        <span class="text-sm font-semibold text-emerald-400 hidden sm:inline">GA4: G-QWBRZPQM2L</span>
+        <button class="relative bg-gray-900 hover:bg-gray-800 border border-gray-800 hover:border-brand-primary/50 text-gray-300 hover:text-white px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center space-x-2">
+          <svg class="w-4 h-4 text-brand-primary fill-current" viewBox="0 0 24 24">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+          <span>我的收藏</span>
+        </button>
       </div>
     </div>
   </header>
@@ -176,9 +177,77 @@
     </div>
 
     <!-- 電影主要網格 (SPA 動態渲染) -->
-    <div id="movie-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div id="movie-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
       <!-- JavaScript 會在此動態置入卡片 -->
     </div>
+
+    <!-- ================= 聯絡我們與留言板區塊 (整合 GA4 自訂事件「林凱蘋」) ================= -->
+    <section class="mt-16 bg-brand-card rounded-3xl p-6 md:p-10 border border-gray-800 shadow-2xl">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <!-- 左側：聯絡資訊與即時留言回饋 -->
+        <div class="flex flex-col justify-between space-y-6">
+          <div>
+            <span class="inline-block px-3 py-1 bg-brand-primary/10 text-brand-primary text-xs font-extrabold tracking-wider rounded-full uppercase mb-4 border border-brand-primary/20">
+              CONTACT US
+            </span>
+            <h2 class="text-2xl md:text-3xl font-black tracking-tight text-white mb-4">
+              聯絡我們 & 影迷留言板
+            </h2>
+            <p class="text-gray-400 text-sm md:text-base leading-relaxed mb-6">
+              歡迎分享您的觀影感想！填寫右側表單發表意見，系統會自動在背景為您觸發專屬的 GA4 自訂追蹤事件。
+            </p>
+          </div>
+          
+          <!-- 留言動態顯示區 -->
+          <div class="space-y-4">
+            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center">
+              <span class="w-1.5 h-3 bg-brand-accent rounded-full mr-2"></span>
+              最新即時影迷回饋
+            </h4>
+            <div id="comments-list" class="space-y-3 max-h-[240px] overflow-y-auto custom-scrollbar pr-2">
+              <!-- JS 會在此動態載入留言資料 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 右側：留言表單 -->
+        <div class="bg-gray-900/40 p-6 md:p-8 rounded-2xl border border-gray-800/80">
+          <form id="contact-form" onsubmit="handleContactSubmit(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2" for="user-name">您的暱稱</label>
+              <input type="text" id="user-name" required class="w-full bg-brand-dark/80 border border-gray-800 focus:border-brand-primary rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none transition-all duration-300" placeholder="例如：頂級電影控">
+            </div>
+            
+            <div>
+              <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2" for="user-email">電子信箱</label>
+              <input type="email" id="user-email" required class="w-full bg-brand-dark/80 border border-gray-800 focus:border-brand-primary rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none transition-all duration-300" placeholder="example@email.com">
+            </div>
+            
+            <div>
+              <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2" for="user-msg">留言訊息</label>
+              <textarea id="user-msg" required rows="4" class="w-full bg-brand-dark/80 border border-gray-800 focus:border-brand-primary rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none transition-all duration-300 resize-none" placeholder="告訴我們您最愛的電影，或是您的建議..."></textarea>
+            </div>
+            
+            <!-- 送出按鈕 (背景依然觸發 GA4 事件：林凱蘋，但前台文字保持純淨) -->
+            <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-brand-primary to-red-500 hover:from-brand-primary hover:to-red-600 text-white rounded-xl font-bold text-sm transition-all duration-300 shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/30 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-2">
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/></svg>
+              <span>送出影迷留言</span>
+            </button>
+          </form>
+
+          <!-- 留言成功提示 (隱藏任何 GA4 技術字眼) -->
+          <div id="form-success-msg" class="hidden mt-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex items-start space-x-3 text-emerald-400 transition-all duration-300">
+            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+              <p class="text-sm font-bold">留言已成功送出！</p>
+              <p class="text-xs text-gray-400 mt-1">感謝您的回饋與分享，您的留言已即時發表至影迷回饋牆。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
   </main>
 
@@ -276,35 +345,16 @@
     </div>
   </div>
 
-  <!-- GA4 除錯提示面板 (右下角 Toast 通知) -->
-  <div id="ga4-toast" class="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-slate-900 border border-emerald-500/30 rounded-2xl p-4 shadow-2xl transition-all duration-500 translate-y-24 opacity-0 pointer-events-none">
-    <div class="flex items-start space-x-3">
-      <div class="flex-shrink-0 bg-emerald-500/10 p-2 rounded-lg text-emerald-400">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-      </div>
-      <div class="flex-1">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">GA4 Real-time Log</span>
-          <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">代碼: G-QWBRZPQM2L</span>
-        </div>
-        <p id="ga4-event-text" class="text-sm text-gray-200 font-mono mt-1"></p>
-        <div class="mt-2 bg-slate-950 p-1.5 rounded text-[11px] text-gray-400 font-mono overflow-x-auto whitespace-nowrap">
-          <span class="text-emerald-500">gtag</span>('event', '<span id="ga4-code-event"></span>', <span id="ga4-code-params"></span>)
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- 頁尾 -->
   <footer class="bg-black/80 border-t border-gray-900 py-12 text-center text-sm text-gray-500">
     <div class="max-w-7xl mx-auto px-4">
       <p class="font-semibold text-gray-400 mb-2">CineWave • 電影指標平台</p>
-      <p class="text-xs mb-4">專屬整合 Google Analytics 4 全方位事件分析功能</p>
+      <p class="text-xs mb-4">最精準的影評與觀眾爆米花鮮度指數評估</p>
       <p class="text-[11px] text-gray-600">本站所引用之電影劇照及評分均屬原版權方所有，僅供學術交流與技術實作演示。</p>
     </div>
   </footer>
 
-  <!-- ================= 核心 JavaScript (包含資料庫、SPA 切換、GA4 觸發器) ================= -->
+  <!-- ================= 核心 JavaScript (包含資料庫、SPA 切換、GA4 背景追蹤、留言板系統) ================= -->
   <script>
     // 1. 電影資料庫 (包含驚悚、科幻、愛情三大類別，詳細爛蘋果指標與專屬劇照)
     const moviesData = {
@@ -422,7 +472,7 @@
           titleEn: 'La La Land',
           year: '2016',
           duration: '128分鐘',
-          plot: '在充滿夢想與追夢者的洛杉磯，落魄的爵士鋼琴家賽巴斯汀與屢試不上的懷夢小演員蜜雅相遇了。兩人在充滿音符與曼妙舞姿的魔幻時刻墜入愛河，但隨著各自夢想的起飛，現實與愛情的拉扯考驗著他們的承諾。',
+          plot: '在充滿夢想與追夢者洛杉磯，落魄的爵士鋼琴家賽巴斯汀與屢試不上的懷夢小演員蜜雅相遇了。兩人在充滿音符與曼妙舞姿的魔幻時刻墜入愛河，但隨著各自夢想的起飛，現實與愛情的拉扯考驗著他們的承諾。',
           critics: 91,
           audience: 81,
           poster: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=600',
@@ -469,34 +519,25 @@
       ]
     };
 
+    // 初始留言板模擬資料
+    const mockComments = [
+      { name: "電影捕手", text: "驚悚分頁的《寄生上流》寫得太讚了！真的是名副其實的第一名！" },
+      { name: "小莉 🎬", text: "希望能多推薦一些小眾的科幻愛情電影，超愛這個網站的質感！" },
+      { name: "SciFi_Guy", text: "《沙丘：第二部》在電影院看的效果真的很無敵，期待第三部！" }
+    ];
+
     // 目前選中的分頁主題 (預設驚悚)
     let currentTab = 'thriller';
 
-    // 2. GA4 專屬自訂事件發送器與提示器 (結合 UI 視覺化)
+    // 2. GA4 專屬背景自訂事件發送器 (完全不影響前台視覺)
     function trackGA4Event(eventName, params) {
-      // 呼叫 Google Analytics 全域函式 gtag 發送事件
+      // 呼叫 Google Analytics 全域函式 gtag 發送事件到雲端
       if (typeof gtag === 'function') {
         gtag('event', eventName, params);
       }
       
-      // 更新 Toast UI 除錯器通知
-      const toast = document.getElementById('ga4-toast');
-      const eventText = document.getElementById('ga4-event-text');
-      const codeEvent = document.getElementById('ga4-code-event');
-      const codeParams = document.getElementById('ga4-code-params');
-      
-      eventText.innerHTML = `已向 GA4 送出事件: <strong class="text-white">${eventName}</strong>`;
-      codeEvent.innerText = eventName;
-      codeParams.innerText = JSON.stringify(params, null, 1);
-      
-      // 顯示 Toast 動畫
-      toast.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
-      
-      // 4 秒後自動收回
-      clearTimeout(window.toastTimeout);
-      window.toastTimeout = setTimeout(() => {
-        toast.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
-      }, 4000);
+      // 在瀏覽器的主控台（Console）輸出詳細日誌，以供技術管理員除錯，一般造訪者看不見
+      console.log(`[GA4 Track Event] ${eventName}`, params);
     }
 
     // 3. SPA 主題分頁切換
@@ -747,10 +788,80 @@
       // ===================================================================
     }
 
+    // 9. 渲染留言板資料
+    function renderComments() {
+      const commentsList = document.getElementById('comments-list');
+      commentsList.innerHTML = '';
+      
+      mockComments.forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'bg-brand-dark/50 p-4 rounded-xl border border-gray-850 flex flex-col space-y-1';
+        item.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-brand-primary">${escapeHtml(c.name)}</span>
+            <span class="text-[10px] text-gray-500">剛剛</span>
+          </div>
+          <p class="text-xs md:text-sm text-gray-300">${escapeHtml(c.text)}</p>
+        `;
+        commentsList.appendChild(item);
+      });
+    }
+
+    // 10. 處理留言表單送出 & 觸發 GA4 事件「林凱蘋」
+    function handleContactSubmit(event) {
+      event.preventDefault();
+      
+      const nameInput = document.getElementById('user-name');
+      const emailInput = document.getElementById('user-email');
+      const msgInput = document.getElementById('user-msg');
+      
+      const userName = nameInput.value.trim();
+      const userEmail = emailInput.value.trim();
+      const userMsg = msgInput.value.trim();
+      
+      if (!userName || !userEmail || !userMsg) return;
+
+      // 1. 新增到前台列表顯示中
+      mockComments.unshift({ name: userName, text: userMsg });
+      renderComments();
+
+      // 2. 清空輸入框
+      nameInput.value = '';
+      emailInput.value = '';
+      msgInput.value = '';
+
+      // 3. 顯示自訂成功提示 (4秒後隱藏)
+      const successToast = document.getElementById('form-success-msg');
+      successToast.classList.remove('hidden');
+      setTimeout(() => {
+        successToast.classList.add('hidden');
+      }, 4000);
+
+      // ================= GA4 追蹤事件: 林凱蘋 (當使用者送出留言時記錄) =================
+      trackGA4Event('林凱蘋', {
+        submit_name: userName,
+        submit_email: userEmail,
+        submit_message: userMsg,
+        timestamp: new Date().toISOString()
+      });
+      // ==============================================================================
+    }
+
+    // 防 XSS 注入安全過濾
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
     // 頁面初始化載入
     window.onload = function() {
       renderMovies();
       updateHeroSection();
+      renderComments();
       
       // 送出首次載入首頁事件給 GA4
       trackGA4Event('homepage_load', {
