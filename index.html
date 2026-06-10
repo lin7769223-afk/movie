@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CineWave - 電影驚悚、科幻、愛情三大主題排行</title>
+  <title>CineWave - 電影驚悚、科幻、愛情三大主題排行與輿情分析</title>
   
   <!-- ================= GA4 追蹤代碼 (Google Tag) - 保持在背景運作，不在前台顯示 ================= -->
   <!-- Google tag (gtag.js) -->
@@ -19,6 +19,8 @@
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN - 用於高質感資料視覺化 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -80,20 +82,24 @@
         </span>
       </div>
       
-      <!-- 主題切換 (SPA 分頁) -->
+      <!-- 主題切換 (SPA 分頁，已擴充 PTT 輿情分析分頁) -->
       <nav class="hidden md:flex space-x-1 bg-gray-900 p-1.5 rounded-full border border-gray-800">
-        <button onclick="switchTab('thriller')" id="nav-thriller" class="nav-tab px-6 py-2 rounded-full font-medium transition-all duration-300 bg-brand-primary text-white shadow-lg shadow-brand-primary/20">
+        <button onclick="switchTab('thriller')" id="nav-thriller" class="nav-tab px-5 py-2 rounded-full font-medium transition-all duration-300 bg-brand-primary text-white shadow-lg shadow-brand-primary/20">
           驚悚懸疑
         </button>
-        <button onclick="switchTab('scifi')" id="nav-scifi" class="nav-tab px-6 py-2 rounded-full font-medium transition-all duration-300 text-gray-400 hover:text-white">
+        <button onclick="switchTab('scifi')" id="nav-scifi" class="nav-tab px-5 py-2 rounded-full font-medium transition-all duration-300 text-gray-400 hover:text-white">
           科幻冒險
         </button>
-        <button onclick="switchTab('romance')" id="nav-romance" class="nav-tab px-6 py-2 rounded-full font-medium transition-all duration-300 text-gray-400 hover:text-white">
+        <button onclick="switchTab('romance')" id="nav-romance" class="nav-tab px-5 py-2 rounded-full font-medium transition-all duration-300 text-gray-400 hover:text-white">
           浪漫愛情
+        </button>
+        <button onclick="switchTab('analysis')" id="nav-analysis" class="nav-tab px-5 py-2 rounded-full font-medium transition-all duration-300 text-gray-400 hover:text-white flex items-center space-x-1.5">
+          <svg class="w-4 h-4 text-brand-accent fill-current" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+          <span>PTT 輿情分析</span>
         </button>
       </nav>
 
-      <!-- 右側收藏清單狀態 (取代原先的 GA4 視覺代碼指示，讓介面更精緻實用) -->
+      <!-- 右側收藏清單狀態 -->
       <div class="flex items-center space-x-3">
         <button class="relative bg-gray-900 hover:bg-gray-800 border border-gray-800 hover:border-brand-primary/50 text-gray-300 hover:text-white px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center space-x-2">
           <svg class="w-4 h-4 text-brand-primary fill-current" viewBox="0 0 24 24">
@@ -106,7 +112,7 @@
   </header>
 
   <!-- 行動裝置分頁導覽 (底部固定) -->
-  <div class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-brand-dark/95 backdrop-blur-md border border-gray-800 rounded-full py-2 px-3 shadow-2xl flex space-x-2 w-[90%] max-w-sm justify-around">
+  <div class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-brand-dark/95 backdrop-blur-md border border-gray-800 rounded-full py-2 px-3 shadow-2xl flex space-x-1.5 w-[92%] max-w-sm justify-around">
     <button onclick="switchTab('thriller')" id="mob-thriller" class="mob-tab flex-1 py-2 text-xs font-semibold rounded-full text-center transition-all duration-300 bg-brand-primary text-white">
       驚悚
     </button>
@@ -116,11 +122,14 @@
     <button onclick="switchTab('romance')" id="mob-romance" class="mob-tab flex-1 py-2 text-xs font-semibold rounded-full text-center transition-all duration-300 text-gray-400">
       愛情
     </button>
+    <button onclick="switchTab('analysis')" id="mob-analysis" class="mob-tab flex-1 py-2 text-xs font-semibold rounded-full text-center transition-all duration-300 text-gray-400">
+      分析
+    </button>
   </div>
 
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-28">
     
-    <!-- 大看板/強檔推薦 (動態根據主題更換) -->
+    <!-- 大看板/強檔推薦 (動態根據主題更換，在分析頁面會隱藏) -->
     <section id="hero-section" class="relative rounded-3xl overflow-hidden mb-12 h-[350px] md:h-[500px] flex items-end shadow-2xl group border border-gray-800">
       <!-- 漸層遮罩與背景圖 -->
       <div id="hero-bg" class="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-in-out scale-105 group-hover:scale-100" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=1600')"></div>
@@ -165,20 +174,139 @@
       </div>
     </section>
 
-    <!-- 分頁內容標題 -->
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h2 id="section-title" class="text-2xl md:text-3xl font-black tracking-tight flex items-center">
-          <span class="w-2.5 h-8 bg-brand-primary rounded-full mr-3"></span>
-          本期【驚悚懸疑】神作排行
-        </h2>
-        <p class="text-gray-400 text-sm mt-1">即時更新爛蘋果鮮度與多視角精彩劇照</p>
+    <!-- 電影主要網格 (電影主題分頁時顯示) -->
+    <div id="movie-grid-container">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h2 id="section-title" class="text-2xl md:text-3xl font-black tracking-tight flex items-center">
+            <span class="w-2.5 h-8 bg-brand-primary rounded-full mr-3"></span>
+            本期【驚悚懸疑】神作排行
+          </h2>
+          <p class="text-gray-400 text-sm mt-1">即時更新爛蘋果鮮度與多視角精彩劇照</p>
+        </div>
+      </div>
+      <div id="movie-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <!-- JavaScript 會在此動態置入電影卡片 -->
       </div>
     </div>
 
-    <!-- 電影主要網格 (SPA 動態渲染) -->
-    <div id="movie-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-      <!-- JavaScript 會在此動態置入卡片 -->
+    <!-- ================= PTT 輿情資料視覺化分析區塊 (預設隱藏，僅在點選分析分頁時切換) ================= -->
+    <div id="analysis-section" class="hidden space-y-10">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between border-b border-gray-800 pb-6">
+        <div>
+          <h2 class="text-3xl font-black tracking-tight flex items-center text-white">
+            <span class="w-2.5 h-8 bg-brand-accent rounded-full mr-3"></span>
+            PTT Movie 板大數據分析牆
+          </h2>
+          <p class="text-gray-400 text-sm mt-1">即時分析網路爬蟲數據 • 掌握第一手社群輿論風向</p>
+        </div>
+        
+        <!-- 爬蟲模擬按鈕 -->
+        <div class="mt-4 md:mt-0 flex items-center space-x-4">
+          <div id="crawler-status" class="text-xs text-gray-500 font-medium">上次爬取：剛剛</div>
+          <button onclick="triggerCrawlerSimulation()" id="crawler-btn" class="px-5 py-2.5 bg-brand-accent text-brand-dark font-black text-xs rounded-xl shadow-lg shadow-brand-accent/10 hover:shadow-brand-accent/20 transition-all duration-300 flex items-center space-x-1.5 active:scale-95">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17"></path></svg>
+            <span>啟動即時爬蟲模擬</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 爬網模擬加載條 (預設隱藏) -->
+      <div id="crawler-progress-container" class="hidden bg-gray-900 border border-brand-accent/20 p-6 rounded-2xl">
+        <div class="flex items-center justify-between text-xs text-brand-accent font-bold mb-2">
+          <span class="flex items-center"><svg class="animate-spin w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>正在連接 ptt.cc/bbs/Movie 伺服器並解析 HTML...</span>
+          <span id="progress-percent">0%</span>
+        </div>
+        <div class="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+          <div id="crawler-progress-bar" class="bg-brand-accent h-2 transition-all duration-300 w-0"></div>
+        </div>
+      </div>
+
+      <!-- 數據圖表看板網格 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- 圖表一：文章分類統計比例 -->
+        <div class="bg-brand-card rounded-2xl p-6 border border-gray-800 shadow-xl flex flex-col justify-between">
+          <div>
+            <h3 class="text-lg font-bold text-white mb-1 flex items-center">
+              <span class="w-1.5 h-4 bg-brand-primary rounded-full mr-2"></span>
+              熱門文章分類比例
+            </h3>
+            <p class="text-xs text-gray-500 mb-6">統計 PTT 精華區與最新 500 篇主題分類標題</p>
+          </div>
+          <div class="relative h-64 flex items-center justify-center">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+
+        <!-- 圖表二：作者發文排行 -->
+        <div class="bg-brand-card rounded-2xl p-6 border border-gray-800 shadow-xl flex flex-col justify-between">
+          <div>
+            <h3 class="text-lg font-bold text-white mb-1 flex items-center">
+              <span class="w-1.5 h-4 bg-brand-accent rounded-full mr-2"></span>
+              活躍發文作者排行
+            </h3>
+            <p class="text-xs text-gray-500 mb-6">統計板內發文密度最高的 KOL 意見領袖發文數量</p>
+          </div>
+          <div class="relative h-64 flex items-center justify-center">
+            <canvas id="authorChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- 數據列表與輿論分析 -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- 原始資料爬取對照表 -->
+        <div class="bg-brand-card rounded-2xl p-6 border border-gray-800 shadow-xl lg:col-span-2">
+          <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+            <svg class="w-5 h-5 text-brand-accent mr-2 fill-current" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            PTT 原始資料抓取清單
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs md:text-sm">
+              <thead>
+                <tr class="border-b border-gray-800 text-gray-500">
+                  <th class="pb-3 font-semibold">分析類型</th>
+                  <th class="pb-3 font-semibold">項目標籤</th>
+                  <th class="pb-3 font-semibold text-right">發文篇數 / 佔比</th>
+                  <th class="pb-3 font-semibold text-right">熱度權重</th>
+                </tr>
+              </thead>
+              <tbody id="ptt-data-table" class="divide-y divide-gray-800/50 text-gray-300">
+                <!-- 由 JavaScript 渲染 PTT 數據 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 輿情摘要、熱詞牆 -->
+        <div class="bg-brand-card rounded-2xl p-6 border border-gray-800 shadow-xl flex flex-col justify-between">
+          <div>
+            <h3 class="text-lg font-bold text-white mb-2 flex items-center">
+              <svg class="w-5 h-5 text-amber-500 mr-2 fill-current" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+              即時社群熱詞標籤雲
+            </h3>
+            <p class="text-xs text-gray-500 mb-6">PTT 板友在討論串中提及頻率最高的關鍵字</p>
+            
+            <div class="flex flex-wrap gap-2 pt-2">
+              <span class="px-3 py-1.5 bg-brand-primary/10 text-brand-primary text-xs font-bold rounded-lg border border-brand-primary/20">好雷 (42篇)</span>
+              <span class="px-3 py-1.5 bg-brand-accent/10 text-brand-accent text-xs font-bold rounded-lg border border-brand-accent/20">寄生上流</span>
+              <span class="px-3 py-1.5 bg-gray-800 text-gray-300 text-xs rounded-lg">普雷 (25篇)</span>
+              <span class="px-3 py-1.5 bg-yellow-500/10 text-yellow-500 text-xs font-bold rounded-lg border border-yellow-500/20">沙丘 2</span>
+              <span class="px-3 py-1.5 bg-gray-800 text-gray-400 text-xs rounded-lg">導演版</span>
+              <span class="px-3 py-1.5 bg-brand-primary/10 text-brand-primary text-xs font-bold rounded-lg border border-brand-primary/20">經典神作</span>
+              <span class="px-3 py-1.5 bg-gray-800 text-gray-300 text-xs rounded-lg">諾蘭</span>
+              <span class="px-3 py-1.5 bg-red-500/10 text-red-500 text-xs font-bold rounded-lg border border-red-500/20">隔離島 懸疑</span>
+            </div>
+          </div>
+
+          <div class="mt-8 border-t border-gray-800 pt-6">
+            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">輿情摘要結論</h4>
+            <p class="text-xs text-gray-400 leading-relaxed">
+              根據本期爬蟲數據 analysis，板友對於「驚悚/懸疑」與「浪漫愛情」電影的討論熱度最高（合計佔比超過50%），其中「好雷」篇數明顯多於「負雷」，整體板風呈現正面期待。
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ================= 聯絡我們與留言板區塊 (整合 GA4 自訂事件「林凱蘋」) ================= -->
@@ -194,7 +322,7 @@
               聯絡我們 & 影迷留言板
             </h2>
             <p class="text-gray-400 text-sm md:text-base leading-relaxed mb-6">
-              歡迎分享您的觀影感想！填寫右側表單發表意見，系統會自動在背景為您觸發專屬的 GA4 自訂追蹤事件。
+              歡迎分享您的觀影感想！填寫右側表單發表意見，系統會自動在背景為您觸發自訂追蹤事件。
             </p>
           </div>
           
@@ -228,14 +356,14 @@
               <textarea id="user-msg" required rows="4" class="w-full bg-brand-dark/80 border border-gray-800 focus:border-brand-primary rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none transition-all duration-300 resize-none" placeholder="告訴我們您最愛的電影，或是您的建議..."></textarea>
             </div>
             
-            <!-- 送出按鈕 (背景依然觸發 GA4 事件：林凱蘋，但前台文字保持純淨) -->
+            <!-- 送出按鈕 -->
             <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-brand-primary to-red-500 hover:from-brand-primary hover:to-red-600 text-white rounded-xl font-bold text-sm transition-all duration-300 shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/30 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-2">
               <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/></svg>
               <span>送出影迷留言</span>
             </button>
           </form>
 
-          <!-- 留言成功提示 (隱藏任何 GA4 技術字眼) -->
+          <!-- 留言成功提示 -->
           <div id="form-success-msg" class="hidden mt-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex items-start space-x-3 text-emerald-400 transition-all duration-300">
             <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -345,16 +473,7 @@
     </div>
   </div>
 
-  <!-- 頁尾 -->
-  <footer class="bg-black/80 border-t border-gray-900 py-12 text-center text-sm text-gray-500">
-    <div class="max-w-7xl mx-auto px-4">
-      <p class="font-semibold text-gray-400 mb-2">CineWave • 電影指標平台</p>
-      <p class="text-xs mb-4">最精準的影評與觀眾爆米花鮮度指數評估</p>
-      <p class="text-[11px] text-gray-600">本站所引用之電影劇照及評分均屬原版權方所有，僅供學術交流與技術實作演示。</p>
-    </div>
-  </footer>
-
-  <!-- ================= 核心 JavaScript (包含資料庫、SPA 切換、GA4 背景追蹤、留言板系統) ================= -->
+  <!-- ================= 核心 JavaScript ================= -->
   <script>
     // 1. 電影資料庫 (包含驚悚、科幻、愛情三大類別，詳細爛蘋果指標與專屬劇照)
     const moviesData = {
@@ -526,21 +645,41 @@
       { name: "SciFi_Guy", text: "《沙丘：第二部》在電影院看的效果真的很無敵，期待第三部！" }
     ];
 
+    // ================= PTT 爬蟲分析大數據源 =================
+    const pttData = {
+      authors: [
+        { name: "abc123", count: 15 },
+        { name: "movieFan", count: 12 },
+        { name: "cinemaKOL", count: 9 },
+        { name: "rottenApple", count: 8 },
+        { name: "shutter_boy", count: 5 }
+      ],
+      categories: [
+        { label: "新聞", count: 35, color: "#45A29E" },
+        { label: "好雷", count: 42, color: "#FF4C60" },
+        { label: "討論", count: 28, color: "#66FCF1" },
+        { label: "情報", count: 18, color: "#F5A623" },
+        { label: "負雷", count: 12, color: "#A83232" },
+        { label: "普雷", count: 25, color: "#9B51E0" }
+      ]
+    };
+
     // 目前選中的分頁主題 (預設驚悚)
     let currentTab = 'thriller';
+    
+    // 圖表實例儲存
+    let categoryChartInstance = null;
+    let authorChartInstance = null;
 
-    // 2. GA4 專屬背景自訂事件發送器 (完全不影響前台視覺)
+    // 2. GA4 專屬背景自訂事件發送器
     function trackGA4Event(eventName, params) {
-      // 呼叫 Google Analytics 全域函式 gtag 發送事件到雲端
       if (typeof gtag === 'function') {
         gtag('event', eventName, params);
       }
-      
-      // 在瀏覽器的主控台（Console）輸出詳細日誌，以供技術管理員除錯，一般造訪者看不見
       console.log(`[GA4 Track Event] ${eventName}`, params);
     }
 
-    // 3. SPA 主題分頁切換
+    // 3. SPA 主題與分析分頁切換
     function switchTab(tabId) {
       currentTab = tabId;
       
@@ -566,24 +705,39 @@
         activeMob.classList.add('bg-brand-primary', 'text-white');
       }
 
-      // 渲染對應主題電影
-      renderMovies();
-      // 更新大看板推薦
-      updateHeroSection();
+      // 判斷是否切換到 PTT 輿情分析分頁
+      const heroSection = document.getElementById('hero-section');
+      const movieGridContainer = document.getElementById('movie-grid-container');
+      const analysisSection = document.getElementById('analysis-section');
 
-      // ================= GA4 追蹤事件 1: tab_view =================
-      let genreName = tabId === 'thriller' ? '驚悚懸疑' : (tabId === 'scifi' ? '科幻冒險' : '浪漫愛情');
+      if (tabId === 'analysis') {
+        heroSection.classList.add('hidden');
+        movieGridContainer.classList.add('hidden');
+        analysisSection.classList.remove('hidden');
+        
+        initAnalysisCharts();
+        renderPttTable();
+      } else {
+        heroSection.classList.remove('hidden');
+        movieGridContainer.classList.remove('hidden');
+        analysisSection.classList.add('hidden');
+        
+        renderMovies();
+        updateHeroSection();
+      }
+
+      // GA4 追蹤事件
+      let genreName = tabId === 'thriller' ? '驚悚懸疑' : (tabId === 'scifi' ? '科幻冒險' : (tabId === 'romance' ? '浪漫愛情' : 'PTT輿情分析'));
       trackGA4Event('tab_view', {
         genre_id: tabId,
         genre_name: genreName,
         timestamp: new Date().toISOString()
       });
-      // ==========================================================
     }
 
     // 4. 更新大看板推薦電影資訊
     function updateHeroSection() {
-      const heroMovie = moviesData[currentTab][0]; // 預設拿各分類第一名當大看板
+      const heroMovie = moviesData[currentTab][0];
       const heroTag = document.getElementById('hero-tag');
       const heroTitle = document.getElementById('hero-title');
       const heroDesc = document.getElementById('hero-desc');
@@ -600,7 +754,6 @@
       heroCritics.innerText = `${heroMovie.critics}%`;
       heroAudience.innerText = `${heroMovie.audience}%`;
 
-      // 綁定大看板深入了解按鈕
       heroMoreBtn.onclick = () => {
         openModal(heroMovie.id);
       };
@@ -620,7 +773,6 @@
       grid.innerHTML = '';
       
       moviesData[currentTab].forEach((movie) => {
-        // 爛蘋果指數視覺化圖示判定
         const appleIcon = movie.critics >= 75 ? '🍎' : '🍏';
         const appleColor = movie.critics >= 75 ? 'text-red-500' : 'text-emerald-500';
         const popcornIcon = movie.audience >= 75 ? '🍿' : '🥤';
@@ -630,18 +782,14 @@
         
         card.innerHTML = `
           <div>
-            <!-- 海報區 -->
             <div class="relative h-64 overflow-hidden">
               <img src="${movie.poster}" alt="${movie.titleCn}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
               <div class="absolute inset-0 bg-gradient-to-t from-brand-card/90 via-transparent to-black/40"></div>
-              
-              <!-- 排名勳章 -->
               <span class="absolute top-4 left-4 bg-amber-500 text-brand-dark font-black text-xs px-2.5 py-1 rounded-md shadow-md z-10">
                 ${movie.rank}
               </span>
             </div>
 
-            <!-- 文字資訊 -->
             <div class="p-6">
               <div class="flex items-center justify-between mb-2">
                 <span class="text-xs text-brand-accent font-semibold tracking-wider">${genreLabel}</span>
@@ -651,7 +799,6 @@
               <h3 class="text-xl font-black text-white group-hover:text-brand-primary transition-colors">${movie.titleCn}</h3>
               <p class="text-xs text-gray-400 font-medium mb-4">${movie.titleEn}</p>
               
-              <!-- 雙爛蘋果數據顯示 -->
               <div class="grid grid-cols-2 gap-3 mb-4 pt-4 border-t border-gray-800">
                 <div class="flex items-center space-x-2">
                   <span class="text-lg">${appleIcon}</span>
@@ -675,7 +822,6 @@
             </div>
           </div>
 
-          <!-- 卡片下方操作鈕 -->
           <div class="p-6 pt-0 flex space-x-2">
             <button onclick="openModal('${movie.id}')" class="flex-1 py-2.5 bg-gray-800 hover:bg-brand-primary text-gray-200 hover:text-white rounded-xl font-bold text-xs transition-all duration-300">
               詳細與劇照集
@@ -690,9 +836,8 @@
       });
     }
 
-    // 6. 開啟電影詳情彈窗 & 動態填入劇照 & 觸發 GA4
+    // 6. 開啟電影詳情彈窗
     function openModal(movieId) {
-      // 在全部資料中尋找該部電影
       let movie = null;
       for (let genre in moviesData) {
         movie = moviesData[genre].find(m => m.id === movieId);
@@ -701,7 +846,6 @@
 
       if (!movie) return;
 
-      // 填入基礎欄位
       document.getElementById('modal-poster').src = movie.poster;
       document.getElementById('modal-rank').innerText = movie.rank;
       document.getElementById('modal-title-cn').innerText = movie.titleCn;
@@ -710,11 +854,9 @@
       document.getElementById('modal-duration').innerText = movie.duration;
       document.getElementById('modal-plot').innerText = movie.plot;
       
-      // 類型標籤中文名
       const genreLabel = currentTab === 'thriller' ? '驚悚懸疑' : (currentTab === 'scifi' ? '科幻冒險' : '浪漫愛情');
       document.getElementById('modal-genre').innerText = genreLabel;
 
-      // 爛蘋果數值與圖示
       document.getElementById('modal-critics-score').innerText = `${movie.critics}%`;
       document.getElementById('modal-audience-score').innerText = `${movie.audience}%`;
       
@@ -732,7 +874,6 @@
         criticsDesc.innerText = '偏酸青蘋果';
       }
 
-      // 填入劇照組 (Stills Gallery)
       const stillsContainer = document.getElementById('modal-stills');
       stillsContainer.innerHTML = '';
       
@@ -748,18 +889,15 @@
         stillsContainer.appendChild(stillDiv);
       });
 
-      // 綁定彈窗的追蹤清單按鈕
       const watchlistBtn = document.getElementById('modal-watchlist-btn');
       watchlistBtn.onclick = () => {
         toggleWatchlist(movie.titleCn);
       };
 
-      // 顯示 Modal
       const modal = document.getElementById('movie-modal');
       modal.classList.remove('hidden');
-      document.body.classList.add('overflow-hidden'); // 阻止主頁面滑動
+      document.body.classList.add('overflow-hidden');
 
-      // ================= GA4 追蹤事件 2: view_movie_detail =================
       trackGA4Event('view_movie_detail', {
         movie_id: movie.id,
         movie_title_cn: movie.titleCn,
@@ -768,24 +906,19 @@
         audience_score: movie.audience,
         genre_category: genreLabel
       });
-      // ====================================================================
     }
 
-    // 7. 關閉彈窗
     function closeModal() {
       const modal = document.getElementById('movie-modal');
       modal.classList.add('hidden');
       document.body.classList.remove('overflow-hidden');
     }
 
-    // 8. 收藏/加入待看清單功能 + GA4 追蹤
     function toggleWatchlist(movieTitle) {
-      // ================= GA4 追蹤事件 3: add_to_watchlist =================
       trackGA4Event('add_to_watchlist', {
         movie_title: movieTitle,
         added_at: new Date().toISOString()
       });
-      // ===================================================================
     }
 
     // 9. 渲染留言板資料
@@ -821,33 +954,177 @@
       
       if (!userName || !userEmail || !userMsg) return;
 
-      // 1. 新增到前台列表顯示中
       mockComments.unshift({ name: userName, text: userMsg });
       renderComments();
 
-      // 2. 清空輸入框
       nameInput.value = '';
       emailInput.value = '';
       msgInput.value = '';
 
-      // 3. 顯示自訂成功提示 (4秒後隱藏)
       const successToast = document.getElementById('form-success-msg');
       successToast.classList.remove('hidden');
       setTimeout(() => {
         successToast.classList.add('hidden');
       }, 4000);
 
-      // ================= GA4 追蹤事件: 林凱蘋 (當使用者送出留言時記錄) =================
       trackGA4Event('林凱蘋', {
         submit_name: userName,
         submit_email: userEmail,
         submit_message: userMsg,
         timestamp: new Date().toISOString()
       });
-      // ==============================================================================
     }
 
-    // 防 XSS 注入安全過濾
+    // 11. PTT 資料視覺化圖表初始化系統
+    function initAnalysisCharts() {
+      Chart.defaults.color = '#9CA3AF';
+      Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.08)';
+
+      const ctxCategory = document.getElementById('categoryChart').getContext('2d');
+      if (categoryChartInstance) categoryChartInstance.destroy();
+      
+      categoryChartInstance = new Chart(ctxCategory, {
+        type: 'doughnut',
+        data: {
+          labels: pttData.categories.map(c => c.label),
+          datasets: [{
+            data: pttData.categories.map(c => c.count),
+            backgroundColor: pttData.categories.map(c => c.color),
+            borderWidth: 2,
+            borderColor: '#1F2833'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                boxWidth: 12,
+                font: { size: 12, family: 'Noto Sans TC' }
+              }
+            }
+          },
+          cutout: '65%'
+        }
+      });
+
+      const ctxAuthor = document.getElementById('authorChart').getContext('2d');
+      if (authorChartInstance) authorChartInstance.destroy();
+
+      authorChartInstance = new Chart(ctxAuthor, {
+        type: 'bar',
+        data: {
+          labels: pttData.authors.map(a => a.name),
+          datasets: [{
+            label: '發文篇數',
+            data: pttData.authors.map(a => a.count),
+            backgroundColor: 'rgba(102, 252, 241, 0.75)',
+            hoverBackgroundColor: '#66FCF1',
+            borderRadius: 6,
+            borderWidth: 0
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { precision: 0 }
+            },
+            y: {
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
+
+    // 12. 渲染 PTT 對照資料表
+    function renderPttTable() {
+      const tbody = document.getElementById('ptt-data-table');
+      tbody.innerHTML = '';
+
+      pttData.categories.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-gray-900/40 transition-colors';
+        tr.innerHTML = `
+          <td class="py-3 font-semibold text-gray-400">看板文章分類</td>
+          <td class="py-3 flex items-center space-x-2">
+            <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${c.color}"></span>
+            <span class="text-white font-medium">[${c.label}] 分類</span>
+          </td>
+          <td class="py-3 text-right text-brand-accent font-bold">${c.count} 篇</td>
+          <td class="py-3 text-right text-xs text-gray-500">權重 高</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      pttData.authors.forEach(a => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-gray-900/40 transition-colors';
+        tr.innerHTML = `
+          <td class="py-3 font-semibold text-gray-400">板友發文排行</td>
+          <td class="py-3 text-gray-300 font-medium">ID: ${a.name}</td>
+          <td class="py-3 text-right text-white font-semibold">${a.count} 篇</td>
+          <td class="py-3 text-right text-xs text-gray-500">活躍度 極高</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 13. 啟動即時爬蟲模擬
+    function triggerCrawlerSimulation() {
+      const btn = document.getElementById('crawler-btn');
+      const progressContainer = document.getElementById('crawler-progress-container');
+      const progressBar = document.getElementById('crawler-progress-bar');
+      const progressPercent = document.getElementById('progress-percent');
+      const statusText = document.getElementById('crawler-status');
+
+      trackGA4Event('ptt_crawler_refresh', {
+        triggered_at: new Date().toISOString()
+      });
+
+      btn.disabled = true;
+      btn.classList.add('opacity-50', 'pointer-events-none');
+      progressContainer.classList.remove('hidden');
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += Math.floor(Math.random() * 15) + 5;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+
+          setTimeout(() => {
+            pttData.categories[1].count += Math.floor(Math.random() * 5) + 1;
+            pttData.categories[0].count += Math.floor(Math.random() * 3) + 1;
+            pttData.authors[0].count += Math.floor(Math.random() * 2) + 1;
+
+            initAnalysisCharts();
+            renderPttTable();
+
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'pointer-events-none');
+            progressContainer.classList.add('hidden');
+            progressBar.style.width = '0%';
+            progressPercent.innerText = '0%';
+
+            const now = new Date();
+            statusText.innerText = `上次爬取：今日 ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+          }, 500);
+        }
+        progressBar.style.width = `${progress}%`;
+        progressPercent.innerText = `${progress}%`;
+      }, 150);
+    }
+
     function escapeHtml(text) {
       return text
         .replace(/&/g, "&amp;")
@@ -857,13 +1134,11 @@
         .replace(/'/g, "&#039;");
     }
 
-    // 頁面初始化載入
     window.onload = function() {
       renderMovies();
       updateHeroSection();
       renderComments();
       
-      // 送出首次載入首頁事件給 GA4
       trackGA4Event('homepage_load', {
         landing_tab: 'thriller',
         referrer: document.referrer || 'direct'
